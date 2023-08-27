@@ -6,7 +6,13 @@ import hpp from 'hpp';
 import compression from 'compression';
 import cookieSession from 'cookie-session';
 import HTTP_STATUS from 'http-status-codes';
+import { Server } from 'socket.io';
+import { createClient } from 'redis';
+import { createAdapter } from '@socket.io/redis-adapter';
+// @socket.io/redis-adapter: if a user who was connected to socket and connects again then this library will maintain the connection
 import 'express-async-errors';
+import { config } from './config';
+import applicationRoutes from './routes';
 
 const SERVER_PORT = 5000;
 
@@ -30,16 +36,16 @@ export class ChattyServer {
     app.use(
       cookieSession({
         name: 'session', // while applying load-balancer on aws this name will be required
-        keys: ['test1', 'test2'],
+        keys: [config.SECRET_KEY_ONE!, config.SECRET_KEY_TWO!], // ! will remove the error
         maxAge: 24 * 7 * 3600000, // cookie will be valid for 7 days
-        secure: false // false means it can be used for http as well, it okay for local environment
+        secure: config.NODE_ENV !== 'development' // false means it can be used for http as well, it okay for local environment
       })
     );
     app.use(hpp());
     app.use(helmet());
     app.use(
       cors({
-        origin: '*', // later it will be replaced client url
+        origin: config.CLIENT_URL, // later '*' will be replaced client url
         credentials: true, // to use cookie set this to true
         optionsSuccessStatus: 200,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -53,7 +59,9 @@ export class ChattyServer {
     app.use(urlencoded({ extended: true, limit: '50mb' }));
   }
 
-  private routesMiddleware(app: Application): void {}
+  private routesMiddleware(app: Application): void {
+    applicationRoutes(app);
+  }
 
   // Global error handler to handle entire application's errors and send it to client
   private globalErrorHandler(app: Application): void {}
@@ -61,18 +69,41 @@ export class ChattyServer {
   private async startServer(app: Application): Promise<void> {
     try {
       const httpServer: http.Server = new http.Server(app);
+      const socketIO: Server = await this.createSocketIO(httpServer);
       this.startHttpServer(httpServer); 
+      this.socketIOConnetions(socketIO);
     } catch (error) {
       console.log(error);
     }
   }
 
-  private createSocketIO(httpServer: http.Server): void {}
+  private async createSocketIO(httpServer: http.Server): Promise<Server> {
+    // create socket instance
+    const io: Server = new Server(httpServer, {
+      cors: {
+        origin: config.CLIENT_URL,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      }
+    });
+
+    // create redis client
+    const pubClient = createClient({ url: config.REDIS_CLIENT}); // this will create client for publishing
+    const subClient = pubClient.duplicate(); // this will create client for subscription
+    await Promise.all([pubClient.connect(), subClient.connect()]);
+    io.adapter(createAdapter(pubClient, subClient));
+    return io;
+  }
 
   private startHttpServer(httpServer: http.Server): void {
+    console.log(`Server has started with process ${process.pid}`);
+    
     httpServer.listen(SERVER_PORT, () => {
       console.log(`Server running on port ${SERVER_PORT}`);
     });
+  }
+
+  private socketIOConnetions(io: Server): void {
+    // every socket connection we'll create will be define here
   }
 
 }
