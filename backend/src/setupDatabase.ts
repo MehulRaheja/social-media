@@ -1,14 +1,17 @@
 import mongoose from "mongoose";
+import Logger from "bunyan";
 import { config } from "./config";
+
+const log: Logger = config.createLogger('setupDatabase'); // whenever we see log/error with the name setupDatabase, means it is coming from server file.
 
 export default () => {
   const connect = () => {
     mongoose.connect(`${config.DATABASE_URL}`)
       .then(() => {
-        console.log('Successfully connected to database');
+        log.info('Successfully connected to database');
       })
       .catch((error) => {
-        console.log('Error connecting to database', error);
+        log.error('Error connecting to database', error);
         return process.exit(1); // to exit the current process, if connecting to db fails
       });
   };

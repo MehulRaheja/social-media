@@ -10,11 +10,14 @@ import { Server } from 'socket.io';
 import { createClient } from 'redis';
 import { createAdapter } from '@socket.io/redis-adapter';
 // @socket.io/redis-adapter: if a user who was connected to socket and connects again then this library will maintain the connection
+import Logger from 'bunyan';
 import 'express-async-errors';
 import { config } from './config';
 import applicationRoutes from './routes';
+import { CustomError, IErrorResponse } from './shared/globals/helpers/error-handler';
 
 const SERVER_PORT = 5000;
+const log: Logger = config.createLogger('server'); // whenever we see log/error with the name server, means it is coming from server file.
 
 export class ChattyServer {
   private app: Application;
@@ -64,16 +67,33 @@ export class ChattyServer {
   }
 
   // Global error handler to handle entire application's errors and send it to client
-  private globalErrorHandler(app: Application): void {}
+  private globalErrorHandler(app: Application): void {
+    // finding url related errors for all the routes
+
+    // throwing error when requested url is not found
+    app.all('*', (req: Request, res: Response) => {
+      res.status(HTTP_STATUS.NOT_FOUND).json({message: `${req.originalUrl} not found`});
+    });
+
+    // if it relates to any error class which is created extending CustomError class then this method will throw that error
+    // we put _ in front of req because we are not using it
+    app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
+      log.error(error);
+      if(error instanceof CustomError) {
+        return res.status(error.statusCode).json(error.serializeErrors());
+      }
+      next();
+    });
+  }
 
   private async startServer(app: Application): Promise<void> {
     try {
       const httpServer: http.Server = new http.Server(app);
-      const socketIO: Server = await this.createSocketIO(httpServer);
+      // const socketIO: Server = await this.createSocketIO(httpServer);
       this.startHttpServer(httpServer); 
-      this.socketIOConnetions(socketIO);
+      // this.socketIOConnetions(socketIO);
     } catch (error) {
-      console.log(error);
+      log.error(error);
     }
   }
 
@@ -95,15 +115,14 @@ export class ChattyServer {
   }
 
   private startHttpServer(httpServer: http.Server): void {
-    console.log(`Server has started with process ${process.pid}`);
+    log.info(`Server has started with process ${process.pid}`);
     
     httpServer.listen(SERVER_PORT, () => {
-      console.log(`Server running on port ${SERVER_PORT}`);
+      log.info(`Server running on port ${SERVER_PORT}`);
     });
   }
 
-  private socketIOConnetions(io: Server): void {
-    // every socket connection we'll create will be define here
-  }
+  // every socket connection we'll create will be define here
+  private socketIOConnetions(io: Server): void {}
 
 }
