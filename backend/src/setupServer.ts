@@ -12,9 +12,9 @@ import { createAdapter } from '@socket.io/redis-adapter';
 // @socket.io/redis-adapter: if a user who was connected to socket and connects again then this library will maintain the connection
 import Logger from 'bunyan';
 import 'express-async-errors';
-import { config } from './config';
-import applicationRoutes from './routes';
-import { CustomError, IErrorResponse } from './shared/globals/helpers/error-handler';
+import { config } from '@root/config';
+import applicationRoutes from '@root/routes';
+import { CustomError, IErrorResponse } from '@global/helpers/error-handler';
 
 const SERVER_PORT = 5000;
 const log: Logger = config.createLogger('server'); // whenever we see log/error with the name server, means it is coming from server file.
@@ -90,7 +90,7 @@ export class ChattyServer {
     try {
       const httpServer: http.Server = new http.Server(app);
       // const socketIO: Server = await this.createSocketIO(httpServer);
-      this.startHttpServer(httpServer); 
+      this.startHttpServer(httpServer);
       // this.socketIOConnetions(socketIO);
     } catch (error) {
       log.error(error);
@@ -116,13 +116,15 @@ export class ChattyServer {
 
   private startHttpServer(httpServer: http.Server): void {
     log.info(`Server has started with process ${process.pid}`);
-    
+
     httpServer.listen(SERVER_PORT, () => {
       log.info(`Server running on port ${SERVER_PORT}`);
     });
   }
 
   // every socket connection we'll create will be define here
-  private socketIOConnetions(io: Server): void {}
+  private socketIOConnetions(io: Server): void {
+    log.info('socketIOConnetions');
+  }
 
 }

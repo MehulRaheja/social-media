@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
-import Logger from "bunyan";
-import { config } from "./config";
+import mongoose from 'mongoose';
+import Logger from 'bunyan';
+import { config } from '@root/config';
 
 const log: Logger = config.createLogger('setupDatabase'); // whenever we see log/error with the name setupDatabase, means it is coming from server file.
 
