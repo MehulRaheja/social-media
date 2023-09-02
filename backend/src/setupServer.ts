@@ -41,7 +41,7 @@ export class ChattyServer {
         name: 'session', // while applying load-balancer on aws this name will be required
         keys: [config.SECRET_KEY_ONE!, config.SECRET_KEY_TWO!], // ! will remove the error
         maxAge: 24 * 7 * 3600000, // cookie will be valid for 7 days
-        secure: config.NODE_ENV !== 'development' // false means it can be used for http as well, it okay for local environment
+        secure: config.NODE_ENV !== 'development' // false means it can be used for http as well, it's okay for local environment
       })
     );
     app.use(hpp());
@@ -49,7 +49,7 @@ export class ChattyServer {
     app.use(
       cors({
         origin: config.CLIENT_URL, // later '*' will be replaced client url
-        credentials: true, // to use cookie set this to true
+        credentials: true, // to use cookie, set this to true
         optionsSuccessStatus: 200,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       })
@@ -123,8 +123,8 @@ export class ChattyServer {
   }
 
   // every socket connection we'll create will be define here
-  private socketIOConnetions(io: Server): void {
-    log.info('socketIOConnetions');
-  }
+  // private socketIOConnetions(io: Server): void {
+  //   log.info('socketIOConnetions');
+  // }
 
 }
