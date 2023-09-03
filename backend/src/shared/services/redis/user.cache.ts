@@ -34,41 +34,66 @@ export class UserCache extends BaseCache {
       bgImageId,
       profilePicture,
     } = createdUser;
-    const firstList: string[] = [
-      '_id', `${_id}`,
-      'username', `${username}`,
-      'email', `${email}`,
-      'avatarColor', `${avatarColor}`,
-      'uId', `${uId}`,
-      'postsCount', `${postsCount}`,
-      'createdAt', `${createdAt}`
+    // const firstList: string[] = [
+    //   '_id', `${_id}`,
+    //   'username', `${username}`,
+    //   'email', `${email}`,
+    //   'avatarColor', `${avatarColor}`,
+    //   'uId', `${uId}`,
+    //   'postsCount', `${postsCount}`,
+    //   'createdAt', `${createdAt}`
 
-    ];
-    const secondList: string[] = [
-      'blocked', `${JSON.stringify(blocked)}`,
-      'blockedBy', `${JSON.stringify(blockedBy)}`,
-      'followersCount', `${followersCount}`,
-      'followingCount', `${followingCount}`,
-      'notifications', `${JSON.stringify(notifications)}`,
-      'social', `${JSON.stringify(social)}`,
-      'profilePicture', `${profilePicture}`,
-    ];
-    const thirdList: string[] = [
-      'work', `${work}`,
-      'school', `${school}`,
-      'quote', `${quote}`,
-      'location', `${location}`,
-      'bgImageVersion', `${bgImageVersion}`,
-      'bgImageId', `${bgImageId}`,
-    ];
-    const dataToSave: string[] = [...firstList, ...secondList, ...thirdList];
+    // ];
+    // const secondList: string[] = [
+    //   'blocked', `${JSON.stringify(blocked)}`,
+    //   'blockedBy', `${JSON.stringify(blockedBy)}`,
+    //   'followersCount', `${followersCount}`,
+    //   'followingCount', `${followingCount}`,
+    //   'notifications', `${JSON.stringify(notifications)}`,
+    //   'social', `${JSON.stringify(social)}`,
+    //   'profilePicture', `${profilePicture}`,
+    // ];
+    // const thirdList: string[] = [
+    //   'work', `${work}`,
+    //   'school', `${school}`,
+    //   'quote', `${quote}`,
+    //   'location', `${location}`,
+    //   'bgImageVersion', `${bgImageVersion}`,
+    //   'bgImageId', `${bgImageId}`,
+    // ];
+    // const dataToSave: string[] = [...firstList, ...secondList, ...thirdList];
+    const dataToSave = {
+      '_id': `${_id}`,
+      'uId': `${uId}`,
+      'username': `${username}`,
+      'email': `${email}`,
+      'avatarColor': `${avatarColor}`,
+      'createdAt': `${createdAt}`,
+      'postsCount': `${postsCount}`,
+      'blocked': JSON.stringify(blocked),
+      'blockedBy': JSON.stringify(blockedBy),
+      'profilePicture': `${profilePicture}`,
+      'followersCount': `${followersCount}`,
+      'followingCount': `${followingCount}`,
+      'notifications': JSON.stringify(notifications),
+      'social': JSON.stringify(social),
+      'work': `${work}`,
+      'location': `${location}`,
+      'school': `${school}`,
+      'quote': `${quote}`,
+      'bgImageVersion': `${bgImageVersion}`,
+      'bgImageId': `${bgImageId}`
+    };
 
     try {
       if(!this.client.isOpen) {
         await this.client.connect();
       }
       await this.client.ZADD('user', { score: parseInt(userUId, 10), value: `${key}`});
-      await this.client.HSET(`users: ${key}`, dataToSave);
+      for (const [itemKey, itemValue] of Object.entries(dataToSave)) {
+        await this.client.HSET(`users:${key}`, `${itemKey}`, `${itemValue}`);
+      }
+      // await this.client.HSET(`users: ${key}`, dataToSave);
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. try again.');
