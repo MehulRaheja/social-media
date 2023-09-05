@@ -11,6 +11,11 @@ import { Helpers } from '@global/helpers/helpers';
 import { UploadApiResponse } from 'cloudinary';
 import { uploads } from '@global/helpers/cloudinary-upload';
 import { IUserDocument } from '@user/interfaces/user.interface';
+import { omit } from 'lodash';
+import { authQueue } from '@service/queues/auth.queue';
+import { userQueue } from '@service/queues/user.queue';
+import Jwt from 'jsonwebtoken';
+import { config } from '@root/config';
 
 const userCache: UserCache = new UserCache();
 
@@ -47,7 +52,28 @@ export class SignUp {
     userDataForCache.profilePicture = `https://res.cloudinary.com/dlft3yfad/image/upload/v${result.version}/${userObjectId}`; //cloudinary use public_id but we are generating public_id by ourselves and i.e. userObjectId
     await userCache.saveUserToCache(`${userObjectId}`, uId, userDataForCache);
 
-    res.status(HTTP_STATUS.CREATED).json({ message: 'User created successfully.', authData });
+    // Add to database
+    omit(userDataForCache, 'uId', 'username', 'email', 'avatarColor', 'password'); //omiting properties which are not going to be saved in the user collection
+    authQueue.addAuthUserJob('addAuthUserToDB', { value: userDataForCache }); // adding a job to the auth queue
+    userQueue.addUserJob('addUserToDB', { value: userDataForCache }); // adding a job to the user queue
+
+    const userJwt: string = SignUp.prototype.signToken(authData, userObjectId);
+    req.session = { jwt: userJwt };
+
+    res.status(HTTP_STATUS.CREATED).json({ message: 'User created successfully.', user: userDataForCache, token: userJwt });
+  }
+
+  private signToken(data: IAuthDocument, userObjectId: ObjectId): string {
+    return Jwt.sign(
+      {
+        userId: userObjectId,
+        uId: data.uId,
+        email: data.email,
+        username: data.username,
+        avatarColor: data.avatarColor,
+      },
+      config.JWT_TOKEN!
+    );
   }
 
   private signupData(data: ISignUpData): IAuthDocument {
