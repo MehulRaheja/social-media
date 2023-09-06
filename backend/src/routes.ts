@@ -10,6 +10,7 @@ export default (app: Application) => {
     // there is no requirement of BASE_PATH
     app.use('/queues', serverAdapter.getRouter());
     app.use(BASE_PATH, authRoutes.routes());
+    app.use(BASE_PATH, authRoutes.signoutRoute());
   };
   routes();
 };

@@ -11,7 +11,7 @@ import { Helpers } from '@global/helpers/helpers';
 import { UploadApiResponse } from 'cloudinary';
 import { uploads } from '@global/helpers/cloudinary-upload';
 import { IUserDocument } from '@user/interfaces/user.interface';
-import { omit } from 'lodash';
+// import { omit } from 'lodash';
 import { authQueue } from '@service/queues/auth.queue';
 import { userQueue } from '@service/queues/user.queue';
 import Jwt from 'jsonwebtoken';
@@ -53,8 +53,8 @@ export class SignUp {
     await userCache.saveUserToCache(`${userObjectId}`, uId, userDataForCache);
 
     // Add to database
-    omit(userDataForCache, 'uId', 'username', 'email', 'avatarColor', 'password'); //omiting properties which are not going to be saved in the user collection
-    authQueue.addAuthUserJob('addAuthUserToDB', { value: userDataForCache }); // adding a job to the auth queue
+    // omit(userDataForCache, 'uId', 'username', 'email', 'avatarColor', 'password'); //omiting properties which are not going to be saved in the user collection
+    authQueue.addAuthUserJob('addAuthUserToDB', { value: authData }); // adding a job to the auth queue
     userQueue.addUserJob('addUserToDB', { value: userDataForCache }); // adding a job to the user queue
 
     const userJwt: string = SignUp.prototype.signToken(authData, userObjectId);
