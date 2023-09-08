@@ -3,6 +3,7 @@ import { BaseCache } from '@service/redis/base.cache';
 import Logger from 'bunyan';
 import { config } from '@root/config';
 import { ServerError } from '@global/helpers/error-handler';
+import { Helpers } from '@global/helpers/helpers';
 
 const log: Logger = config.createLogger('userCache');
 
@@ -94,6 +95,29 @@ export class UserCache extends BaseCache {
         await this.client.HSET(`users:${key}`, `${itemKey}`, `${itemValue}`);
       }
       // await this.client.HSET(`users: ${key}`, dataToSave);
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. try again.');
+    }
+  }
+
+  public async getUserFromCache(userId: string): Promise<IUserDocument | null> {
+    try {
+      if(!this.client.isOpen) {
+        await this.client.connect();
+      }
+
+      const response: IUserDocument = await this.client.HGETALL(`users:${userId}`) as unknown as IUserDocument; // we can't directly cast it into IUserDocument so need to make the result unkown first
+      response.createdAt = new Date(Helpers.parseJson(`${response.createdAt}`));
+      response.postsCount = Helpers.parseJson(`${response.postsCount}`);
+      response.blocked = Helpers.parseJson(`${response.blocked}`);
+      response.blockedBy = Helpers.parseJson(`${response.blockedBy}`);
+      response.notifications = Helpers.parseJson(`${response.notifications}`);
+      response.social = Helpers.parseJson(`${response.social}`);
+      response.followersCount = Helpers.parseJson(`${response.followersCount}`);
+      response.followingCount = Helpers.parseJson(`${response.followingCount}`);
+
+      return response;
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. try again.');
