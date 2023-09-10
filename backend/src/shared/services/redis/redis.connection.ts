@@ -9,7 +9,7 @@ class RedisConnection extends BaseCache {
     super('redisConnection');
   }
 
-  async connect (): Promise<void> {
+  async connect(): Promise<void> {
     try {
       await this.client.connect();
       const res = await this.client.ping();

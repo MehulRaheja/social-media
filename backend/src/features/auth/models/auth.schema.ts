@@ -11,9 +11,10 @@ const authSchema: Schema = new Schema(
     email: { type: String },
     password: { type: String },
     avatarColor: { type: String },
-    createdAt: { type: Date, default: Date.now },
+    createdAt: { type: Date, default: Date.now }
   },
-  { // when we return the authSchema document, password field will be removed from it.
+  {
+    // when we return the authSchema document, password field will be removed from it.
     // if we don't want to return any other property upon query, just delete it here.
     toJSON: {
       transform(_doc, ret) {
@@ -26,7 +27,7 @@ const authSchema: Schema = new Schema(
 
 // below method will hash the password before we save it to the database
 // this refers to the particular document that has been created
-authSchema.pre('save', async function (this: IAuthDocument, next: () => void ) {
+authSchema.pre('save', async function (this: IAuthDocument, next: () => void) {
   const hashedPassword: string = await hash(this.password as string, SALT_ROUND);
   this.password = hashedPassword;
   next();
@@ -42,5 +43,5 @@ authSchema.methods.hashPassword = async function (password: string): Promise<str
   return hash(password, SALT_ROUND);
 };
 
-  const AuthModel: Model<IAuthDocument> = model<IAuthDocument>('Auth', authSchema, 'Auth');
-  export { AuthModel };
+const AuthModel: Model<IAuthDocument> = model<IAuthDocument>('Auth', authSchema, 'Auth');
+export { AuthModel };

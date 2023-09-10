@@ -7,7 +7,8 @@ const log: Logger = config.createLogger('setupDatabase'); // whenever we see log
 
 export default () => {
   const connect = () => {
-    mongoose.connect(`${config.DATABASE_URL}`)
+    mongoose
+      .connect(`${config.DATABASE_URL}`)
       .then(() => {
         log.info('Successfully connected to database');
         redisConnetion.connect();
@@ -19,5 +20,5 @@ export default () => {
   };
   connect();
 
-  mongoose.connection.on('disconnected', connect);  // If mongoose gets disconnected then it will try to connect again
+  mongoose.connection.on('disconnected', connect); // If mongoose gets disconnected then it will try to connect again
 };

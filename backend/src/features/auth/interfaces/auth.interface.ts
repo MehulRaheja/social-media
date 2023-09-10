@@ -2,7 +2,6 @@ import { Document } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { IUserDocument } from '@user/interfaces/user.interface';
 
-
 // here we added a new property to the interface Request which is part of already existing namespace i.e. Express
 // currentUser is added to Request interface of the Express, preexisting properties are req.body, req.params, req.query etc.
 declare global {

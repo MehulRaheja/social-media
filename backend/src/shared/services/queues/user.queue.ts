@@ -1,14 +1,15 @@
-
 import { BaseQueue } from '@service/queues/base.queue';
 import { userWorker } from '@worker/user.worker';
 
 class UserQueue extends BaseQueue {
-  constructor () {
+  constructor() {
     super('user');
     this.processJob('addUserToDB', 5, userWorker.addUserToDB); // this method will process job in the queue
   }
 
-  public addUserJob(name: string, data: any): void { // this method will add job to the queue
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public addUserJob(name: string, data: any): void {
+    // this method will add job to the queue
     this.addJob(name, data);
   }
 }

@@ -1,4 +1,4 @@
-import { Application, json, urlencoded, Response, Request, NextFunction} from 'express';
+import { Application, json, urlencoded, Response, Request, NextFunction } from 'express';
 import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -51,7 +51,7 @@ export class ChattyServer {
         origin: config.CLIENT_URL, // later '*' will be replaced client url
         credentials: true, // to use cookie, set this to true
         optionsSuccessStatus: 200,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
       })
     );
   }
@@ -72,14 +72,14 @@ export class ChattyServer {
 
     // throwing error when requested url is not found
     app.all('*', (req: Request, res: Response) => {
-      res.status(HTTP_STATUS.NOT_FOUND).json({message: `${req.originalUrl} not found`});
+      res.status(HTTP_STATUS.NOT_FOUND).json({ message: `${req.originalUrl} not found` });
     });
 
     // if it relates to any error class which is created extending CustomError class then this method will throw that error
     // we put _ in front of req because we are not using it
     app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
       log.error(error);
-      if(error instanceof CustomError) {
+      if (error instanceof CustomError) {
         return res.status(error.statusCode).json(error.serializeErrors());
       }
       next();
@@ -102,12 +102,12 @@ export class ChattyServer {
     const io: Server = new Server(httpServer, {
       cors: {
         origin: config.CLIENT_URL,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
       }
     });
 
     // create redis client
-    const pubClient = createClient({ url: config.REDIS_CLIENT}); // this will create client for publishing
+    const pubClient = createClient({ url: config.REDIS_CLIENT }); // this will create client for publishing
     const subClient = pubClient.duplicate(); // this will create client for subscription
     await Promise.all([pubClient.connect(), subClient.connect()]);
     io.adapter(createAdapter(pubClient, subClient));
@@ -123,8 +123,8 @@ export class ChattyServer {
   }
 
   // every socket connection we'll create will be define here
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private socketIOConnetions(io: Server): void {
     log.info('socketIOConnetions');
   }
-
 }

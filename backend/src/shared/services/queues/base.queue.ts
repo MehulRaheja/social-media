@@ -8,8 +8,7 @@ import { IAuthJob } from '@auth/interfaces/auth.interface';
 // import { BaseAdapter } from '@bull-board/api/dist/src/queueAdapters/base';
 // import BullMQ from 'bullmq';
 
-type IBaseJobData =
- | IAuthJob;
+type IBaseJobData = IAuthJob;
 
 const bullAdapters: BullAdapter[] = [];
 export let serverAdapter: ExpressAdapter;
@@ -18,7 +17,7 @@ export abstract class BaseQueue {
   queue: Queue.Queue;
   log: Logger;
 
-  constructor (queueName: string) {
+  constructor(queueName: string) {
     this.queue = new Queue(queueName, `${config.REDIS_CLIENT}`);
     bullAdapters.push(new BullAdapter(this.queue));
     // bullAdapters = [...new Set(bullAdapters)]; // to remove duplicate queues
@@ -59,5 +58,5 @@ export abstract class BaseQueue {
   // concurrency: how many jobs we want to process at a time
   protected processJob(name: string, concurrency: number, callback: Queue.ProcessCallbackFunction<void>): void {
     this.queue.process(name, concurrency, callback);
-  };
+  }
 }

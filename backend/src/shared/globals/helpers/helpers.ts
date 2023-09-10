@@ -1,4 +1,3 @@
-
 export class Helpers {
   // for using static methods of a class there is no need to instantiate the class with new keyword
   static firstLetterUppercase(str: string): string {

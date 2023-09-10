@@ -1,4 +1,4 @@
-import cloudinary, { UploadApiResponse, UploadApiErrorResponse} from 'cloudinary';
+import cloudinary, { UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
 
 // file is base64 string
 // when we upload a file cloudinary will generate public id for us automatically & we can also set public id manually
@@ -19,9 +19,9 @@ export function uploads(
         invalidate
       },
       (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
-        if(error) resolve(error);
+        if (error) resolve(error);
         resolve(result);
       }
     );
   });
-};
+}

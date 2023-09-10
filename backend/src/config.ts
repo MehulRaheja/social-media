@@ -16,7 +16,8 @@ class Config {
   public CLOUD_API_KEY: string | undefined;
   public CLOUD_API_SECRET: string | undefined;
 
-  private readonly DEFAULT_DATABASE_URL = 'mongodb+srv://filehandle:M6sVOhpQRRC7PpLz@cluster0.y6eg7.mongodb.net/social-media?retryWrites=true&w=majority';
+  private readonly DEFAULT_DATABASE_URL =
+    'mongodb+srv://filehandle:M6sVOhpQRRC7PpLz@cluster0.y6eg7.mongodb.net/social-media?retryWrites=true&w=majority';
 
   constructor() {
     this.DATABASE_URL = process.env.DATABASE_URL || this.DEFAULT_DATABASE_URL;
@@ -35,13 +36,13 @@ class Config {
   // | ./node_modules/.bin/bunyan (for mac)  is added to dev script in package.json to use this library for logging purposes
   // | .\\node_modules\\.bin\\bunyan (for windows)
   public createLogger(name: string): bunyan {
-    return bunyan.createLogger({ name, level: 'debug'});
+    return bunyan.createLogger({ name, level: 'debug' });
   }
 
   public validateConfig(): void {
     // this keyword refers to an object, it contains all the above properties as key-value pairs
-    for(const [key, value] of Object.entries(this)) {
-      if(value === undefined) {
+    for (const [key, value] of Object.entries(this)) {
+      if (value === undefined) {
         throw new Error(`Configuration ${key} is undefined.`);
       }
     }
@@ -55,6 +56,6 @@ class Config {
       api_secret: this.CLOUD_API_SECRET
     });
   }
-};
+}
 
 export const config: Config = new Config();

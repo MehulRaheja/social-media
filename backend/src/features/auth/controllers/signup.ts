@@ -22,9 +22,9 @@ const userCache: UserCache = new UserCache();
 export class SignUp {
   @joiValidation(signupSchema)
   public async create(req: Request, res: Response): Promise<void> {
-    const { username, password, email, avatarColor, avatarImage} = req.body;
+    const { username, password, email, avatarColor, avatarImage } = req.body;
     const checkIfUserExist: IAuthDocument = await authService.getUserByUsernameOrEmail(username, email);
-    if(checkIfUserExist){
+    if (checkIfUserExist) {
       throw new BadRequestError('Invalid credentials');
     }
 
@@ -42,8 +42,8 @@ export class SignUp {
       password,
       avatarColor
     });
-    const result: UploadApiResponse = await uploads(avatarImage, `${userObjectId}`, true, true) as UploadApiResponse;
-    if(!result?.public_id) {
+    const result: UploadApiResponse = (await uploads(avatarImage, `${userObjectId}`, true, true)) as UploadApiResponse;
+    if (!result?.public_id) {
       throw new BadRequestError('File upload: Error occured. Try again.');
     }
 
@@ -70,7 +70,7 @@ export class SignUp {
         uId: data.uId,
         email: data.email,
         username: data.username,
-        avatarColor: data.avatarColor,
+        avatarColor: data.avatarColor
       },
       config.JWT_TOKEN!
     );
@@ -127,5 +127,4 @@ export class SignUp {
       }
     } as unknown as IUserDocument;
   }
-
 }
