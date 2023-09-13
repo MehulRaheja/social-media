@@ -6,6 +6,7 @@ import { CustomError } from '@global/helpers/error-handler';
 import { authService } from '@service/db/auth.service';
 import { UserCache } from '@service/redis/user.cache';
 
+jest.useFakeTimers(); // to fake setTimeout and setInterval methods
 // here we mock all the methods that are required for signup because we don't want to use the actual implementation
 jest.mock('@service/queues/base.queue');
 jest.mock('@service/redis/user.cache');
@@ -14,6 +15,14 @@ jest.mock('@service/queues/auth.queue');
 jest.mock('@global/helpers/cloudinary-upload');
 
 describe('SignUp', () => {
+  beforeEach(() => {
+    jest.resetAllMocks(); // before starting any test it will reset all the mocked functions
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks(); // all mock functions of the test will be clear here
+    jest.clearAllTimers(); // all the fake timeout and interval methods will be cleared here
+  });
 
   it('should throw an error if username is not available', () => {
     const req: Request = authMockRequest({}, {

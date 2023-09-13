@@ -26,6 +26,7 @@ export interface IAuthMock {
   email?: string;
   uId?: string;
   password?: string;
+  confirmPassword?: string;
   avatarImage?: string;
   avatarColor?: string;
   createdAt?: Date | string;
@@ -60,4 +61,17 @@ export const signUpMockData = {
   password: 'password',
   birthDay: { month: '', day: '' },
   postCount: 0,
+  blocked: [],
+  blockedBy: [],
+  work: '',
+  location: '',
+  school: '',
+  quote: '',
+  bgImageVersion: '',
+  bgImageId: '',
+  followersCount: 0,
+  followingCount: 0,
+  postsCount: 0,
+  notifications: [Object],
+  social: [Object]
 };
