@@ -36,7 +36,6 @@ export class SignIn {
       },
       config.JWT_TOKEN!
     );
-
     req.session = { jwt: userJwt };
     const userDocument: IUserDocument = {
       ...user,
