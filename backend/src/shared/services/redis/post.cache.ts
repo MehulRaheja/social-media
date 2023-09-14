@@ -12,7 +12,7 @@ export class PostCache extends BaseCache {
   }
 
   public async savePostToCache(data: ISavePostToCache): Promise<void> {
-    const { key, currentUserId, uId, createPost} = data;
+    const { key, currentUserId, uId, createdPost} = data;
     const {
       _id,
       userId,
@@ -30,7 +30,7 @@ export class PostCache extends BaseCache {
       privacy,
       reactions,
       createdAt
-    } = createPost;
+    } = createdPost;
 
     const dataToSave = {
       '_id': `${_id}`,
@@ -58,7 +58,7 @@ export class PostCache extends BaseCache {
         await this.client.connect();
       }
 
-      const postCount: string[] = await this.client.HMGET(`users:${currentUserId},postsCount`);
+      const postCount: string[] = await this.client.HMGET(`users:${currentUserId}`, 'postsCount');
       // multi method in redis is used to call multiple redis commands
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       await this.client.ZADD('post', { score: parseInt(uId, 10), value: `${key}` });

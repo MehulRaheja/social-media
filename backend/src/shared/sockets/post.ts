@@ -2,7 +2,7 @@
 import { Server, Socket } from 'socket.io';
 
 // we will emit event of post from this object
-let socketIOPostObject: Server;
+export let socketIOPostObject: Server;
 
 export class SocketIOPostHandler {
   private io: Server;
