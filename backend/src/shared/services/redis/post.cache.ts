@@ -93,6 +93,8 @@ export class PostCache extends BaseCache {
       for(const value of reply) {
         multi.HGETALL(`posts:${value}`);
       }
+
+      // we are expecting replies to return a type of IPostDocument array, so we need to create a type for it which contains all the types that can be expected from replies.
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       const postReplies: IPostDocument[] = [];
       for(const post of replies as IPostDocument[]){
@@ -103,6 +105,94 @@ export class PostCache extends BaseCache {
       }
 
       return postReplies;
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. try again.');
+    }
+  }
+
+  public async getTotalPostsInCache(): Promise<number> {
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      }
+      const count: number = await this.client.ZCARD('post');
+      return count;
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. try again.');
+    }
+  }
+
+  public async getPostsWithImagesFromCache(key: string, start: number, end: number): Promise<IPostDocument[]> {
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      }
+
+      // returns the array of zadd ids
+      const reply: string[] = await this.client.ZRANGE(key, start, end, { REV: true });
+      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+      for(const value of reply) {
+        multi.HGETALL(`posts:${value}`);
+      }
+
+      // we are expecting replies to return a type of IPostDocument array, so we need to create a type for it which contains all the types that can be expected from replies.
+      const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
+      const postWithImages: IPostDocument[] = [];
+      for(const post of replies as IPostDocument[]){
+        if((post.imgId && post.imgVersion) || post.gifUrl) {
+          post.commentsCount = Helpers.parseJson(`${post.commentsCount}`) as number;
+          post.reactions = Helpers.parseJson(`${post.reactions}`) as IReactions;
+          post.createdAt = new Date(Helpers.parseJson(`${post.createdAt}`)) as Date;
+          postWithImages.push(post);
+        }
+      }
+
+      return postWithImages;
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. try again.');
+    }
+  }
+
+  public async getUserPostsFromCache(key: string, uId: number): Promise<IPostDocument[]> {
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      }
+
+      // returns the array of zadd ids
+      const reply: string[] = await this.client.ZRANGE(key, uId, uId, { REV: true, BY: 'SCORE' }); // getting post by score in reverse order
+      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+      for(const value of reply) {
+        multi.HGETALL(`posts:${value}`);
+      }
+
+      // we are expecting replies to return a type of IPostDocument array, so we need to create a type for it which contains all the types that can be expected from replies.
+      const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
+      const postReplies: IPostDocument[] = [];
+      for(const post of replies as IPostDocument[]){
+        post.commentsCount = Helpers.parseJson(`${post.commentsCount}`) as number;
+        post.reactions = Helpers.parseJson(`${post.reactions}`) as IReactions;
+        post.createdAt = new Date(Helpers.parseJson(`${post.createdAt}`)) as Date;
+        postReplies.push(post);
+      }
+
+      return postReplies;
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. try again.');
+    }
+  }
+
+  public async getTotalUserPostsInCache(uId: number): Promise<number> {
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      }
+      const count: number = await this.client.ZCOUNT('post', uId, uId); // ZCOUNT is used because we can also add other properties as well
+      return count;
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. try again.');
