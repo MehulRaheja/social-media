@@ -198,4 +198,27 @@ export class PostCache extends BaseCache {
       throw new ServerError('Server error. try again.');
     }
   }
+
+  public async deletePostFromCache(key: string, currentUserId: string): Promise<void> {
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      }
+      const postCount: string[] = await this.client.HMGET(`users:${currentUserId}`, 'postsCount');
+      // multi method in redis is used to call multiple redis commands
+      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+      //ZREM is used to remove an item from the set
+      multi.ZREM('post', `${key}`);
+      //DEL is for delete
+      multi.DEL(`posts:${key}`); // This will take the hash and delete the entire post/items related to that hash
+      multi.DEL(`comments:${key}`); // This will take the hash and delete the all comments related to that hash
+      multi.DEL(`reactions:${key}`); // This will take the hash and delete the all comments related to that hash
+      const count: number = parseInt(postCount[0], 10) - 1;
+      multi.HSET(`users:${currentUserId}`, ['postsCount', count]);
+      await multi.exec();
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. try again.');
+    }
+  }
 }

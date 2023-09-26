@@ -17,6 +17,19 @@ withCredentials: true
 }
 
 ###
+GET http://localhost:5000/api/v1/post/all/1
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+###
+GET http://localhost:5000/api/v1/post/images/1
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+
+###
 POST {{baseUrl}}/{{urlPath}}/post/image/post
 Content-Type: application/json
 Accept: application/json
