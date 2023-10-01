@@ -214,8 +214,41 @@ export class PostCache extends BaseCache {
       multi.DEL(`comments:${key}`); // This will take the hash and delete the all comments related to that hash
       multi.DEL(`reactions:${key}`); // This will take the hash and delete the all comments related to that hash
       const count: number = parseInt(postCount[0], 10) - 1;
-      multi.HSET(`users:${currentUserId}`, ['postsCount', count]);
+      multi.HSET(`users:${currentUserId}`, 'postsCount', count);
       await multi.exec();
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. try again.');
+    }
+  }
+
+  public async updatePostInCache(key: string, updatedPost: IPostDocument): Promise<IPostDocument> {
+    const { post, bgColor, feelings, privacy, gifUrl, imgVersion, imgId, profilePicture } = updatedPost;
+    const dataToSave = {
+      'profilePicture': `${profilePicture}`,
+      'post': `${post}`,
+      'bgColor': `${bgColor}`,
+      'feelings': `${feelings}`,
+      'privacy': `${privacy}`,
+      'gifUrl': `${gifUrl}`,
+      'imgVersion': `${imgVersion}`,
+      'imgId': `${imgId}`,
+    };
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      }
+      for(const [itemKey, itemValue] of Object.entries(dataToSave)) {
+        await this.client.HSET(`posts:${key}`, `${itemKey}`, `${itemValue}`); // update post's fields are saved in the cache
+      }
+      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+      multi.HGETALL(`posts:${key}`); // get the complete hash
+      const reply: PostCacheMultiType = await multi.exec() as PostCacheMultiType; // data we get doesn't have any type so we created a special type which is assigned to it
+      const postReply = reply as IPostDocument[]; // we can't use reply because of its type, here we assign it to a new type which we want to return
+      postReply[0].commentsCount = Helpers.parseJson(`${postReply[0].commentsCount}`) as number;
+      postReply[0].reactions = Helpers.parseJson(`${postReply[0].reactions}`) as IReactions;
+      postReply[0].createdAt = new Date(Helpers.parseJson(`${postReply[0].createdAt}`)) as Date;
+      return postReply[0];
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. try again.');
