@@ -15,6 +15,7 @@ import 'express-async-errors';
 import { config } from '@root/config';
 import applicationRoutes from '@root/routes';
 import { CustomError, IErrorResponse } from '@global/helpers/error-handler';
+import { SocketIOPostHandler } from '@socket/post';
 
 const SERVER_PORT = 5000;
 const log: Logger = config.createLogger('server'); // whenever we see log/error with the name server, means it is coming from server file.
@@ -123,8 +124,9 @@ export class ChattyServer {
   }
 
   // every socket connection we'll create will be define here
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private socketIOConnetions(io: Server): void {
-    log.info('socketIOConnetions');
+    const postSocketHandler: SocketIOPostHandler = new SocketIOPostHandler(io);
+
+    postSocketHandler.listen();
   }
 }
