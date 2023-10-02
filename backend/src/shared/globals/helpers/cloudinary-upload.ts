@@ -19,7 +19,7 @@ export function uploads(
         invalidate
       },
       (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
-        if (error) resolve(error);
+        if (error) resolve(error); // we are not throwing an error here just returning the error. So that error handling can be done where the funciton is called
         resolve(result);
       }
     );
