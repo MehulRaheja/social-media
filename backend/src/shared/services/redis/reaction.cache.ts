@@ -27,7 +27,7 @@ export class ReactionCache extends BaseCache {
       }
 
       if(previousReaction){ // if there is previous reaction then we will remove it first
-        // call remove reaction method
+        this.removePostReactionFromCache(key, reaction.username, postReactions);
       }
 
       if (type) { // if there is type then we will add the reaction
