@@ -35,34 +35,6 @@ export class UserCache extends BaseCache {
       bgImageId,
       profilePicture
     } = createdUser;
-    // const firstList: string[] = [
-    //   '_id', `${_id}`,
-    //   'username', `${username}`,
-    //   'email', `${email}`,
-    //   'avatarColor', `${avatarColor}`,
-    //   'uId', `${uId}`,
-    //   'postsCount', `${postsCount}`,
-    //   'createdAt', `${createdAt}`
-
-    // ];
-    // const secondList: string[] = [
-    //   'blocked', `${JSON.stringify(blocked)}`,
-    //   'blockedBy', `${JSON.stringify(blockedBy)}`,
-    //   'followersCount', `${followersCount}`,
-    //   'followingCount', `${followingCount}`,
-    //   'notifications', `${JSON.stringify(notifications)}`,
-    //   'social', `${JSON.stringify(social)}`,
-    //   'profilePicture', `${profilePicture}`,
-    // ];
-    // const thirdList: string[] = [
-    //   'work', `${work}`,
-    //   'school', `${school}`,
-    //   'quote', `${quote}`,
-    //   'location', `${location}`,
-    //   'bgImageVersion', `${bgImageVersion}`,
-    //   'bgImageId', `${bgImageId}`,
-    // ];
-    // const dataToSave: string[] = [...firstList, ...secondList, ...thirdList];
     const dataToSave = {
       _id: `${_id}`,
       uId: `${uId}`,
