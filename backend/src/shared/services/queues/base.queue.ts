@@ -7,10 +7,11 @@ import { config } from '@root/config';
 import { IAuthJob } from '@auth/interfaces/auth.interface';
 import { IEmailJob } from '@user/interfaces/user.interface';
 import { IPostJobData } from '@post/interfaces/post.interface';
+import { IReactionJob } from '@reaction/interfaces/reaction.interface';
 // import { BaseAdapter } from '@bull-board/api/dist/src/queueAdapters/base';
 // import BullMQ from 'bullmq';
 
-type IBaseJobData = IAuthJob | IEmailJob | IPostJobData;
+type IBaseJobData = IAuthJob | IEmailJob | IPostJobData | IReactionJob;
 
 const bullAdapters: BullAdapter[] = [];
 export let serverAdapter: ExpressAdapter;
