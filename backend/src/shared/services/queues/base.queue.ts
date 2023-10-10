@@ -13,7 +13,7 @@ import { IReactionJob } from '@reaction/interfaces/reaction.interface';
 
 type IBaseJobData = IAuthJob | IEmailJob | IPostJobData | IReactionJob;
 
-const bullAdapters: BullAdapter[] = [];
+let bullAdapters: BullAdapter[] = [];
 export let serverAdapter: ExpressAdapter;
 
 export abstract class BaseQueue {
@@ -23,9 +23,9 @@ export abstract class BaseQueue {
   constructor(queueName: string) {
     this.queue = new Queue(queueName, `${config.REDIS_CLIENT}`);
     bullAdapters.push(new BullAdapter(this.queue));
-    // bullAdapters = [...new Set(bullAdapters)]; // to remove duplicate queues
+    bullAdapters = [...new Set(bullAdapters)]; // to remove duplicate queues
     serverAdapter = new ExpressAdapter();
-    serverAdapter.setBasePath('/queue');
+    serverAdapter.setBasePath('/queues');
 
     // creating a bull board
     createBullBoard({

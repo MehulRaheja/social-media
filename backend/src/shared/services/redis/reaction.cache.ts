@@ -32,8 +32,7 @@ export class ReactionCache extends BaseCache {
 
       if (type) { // if there is type then we will add the reaction
         await this.client.LPUSH(`reactions:${key}`, JSON.stringify(reaction)); // list in redis accepts data in string so we have to stringify it first
-        const dataToSave: string[] = ['reactions', JSON.stringify(postReactions)];
-        await this.client.HSET(`posts:${key}`, dataToSave); // update the post's reactions field after adding reaction
+        await this.client.HSET(`posts:${key}`, 'reactions', JSON.stringify(postReactions)); // update the post's reactions field after adding reaction
       }
 
     } catch (error) {
@@ -55,8 +54,52 @@ export class ReactionCache extends BaseCache {
       multi.LREM(`reactions:${key}`, 1, JSON.stringify(userPreviousReaction)); // LREM is used to remove an string from a redis list
       await multi.exec();
 
-      const dataToSave: string[] = ['reactions', JSON.stringify(postReactions)];
-      await this.client.HSET(`posts:${key}`, dataToSave);
+      await this.client.HSET(`posts:${key}`, 'reactions', JSON.stringify(postReactions));
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again.');
+    }
+  }
+
+  public async getReactionsFromCache(postId: string): Promise<[IReactionDocument[], number]> {
+    try {
+      if(!this.client.isOpen) {
+        await this.client.connect();
+      }
+      // LLEN is used to get length of the list in redis
+      const reactionsCount: number = await this.client.LLEN(`reactions:${postId}`);
+
+      // LRANGE: to get data from the redis list
+      // ZRANGE: to get data from the redis hashmap
+      const resposnse: string[] = await this.client.LRANGE(`reactions:${postId}`, 0, -1); // to get all the data from the list
+      const list: IReactionDocument[] = [];
+      for(const item of resposnse){
+        list.push(Helpers.parseJson(item));
+      }
+      return resposnse.length ? [list, reactionsCount] : [[], 0];
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again.');
+    }
+  }
+
+  public async getSingleReactionByUsernameFromCache(postId: string, username: string): Promise<[IReactionDocument, number] | []> {
+    try {
+      if(!this.client.isOpen) {
+        await this.client.connect();
+      }
+      // LRANGE: to get data from the redis list
+      // ZRANGE: to get data from the redis hashmap
+      const resposnse: string[] = await this.client.LRANGE(`reactions:${postId}`, 0, -1); // to get all the data from the list
+      const list: IReactionDocument[] = [];
+      for(const item of resposnse){
+        list.push(Helpers.parseJson(item));
+      }
+      const result: IReactionDocument = find(list, (listItem: IReactionDocument) => {
+        return listItem?.postId === postId && listItem?.username === username;
+      }) as IReactionDocument;
+
+      return result ? [result, 1] : [];
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again.');
