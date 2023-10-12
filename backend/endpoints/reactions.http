@@ -23,3 +23,21 @@ Accept: application/json
 withCredentials: true
 
 {}
+
+###
+GET  {{baseUrl}}/{{urlPath}}/post/reactions/651f813ad2d65daac4c6063a
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+###
+GET  {{baseUrl}}/{{urlPath}}/post/single/reaction/username/Mehul/651f813ad2d65daac4c6063a
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+###
+GET  {{baseUrl}}/{{urlPath}}/post/reactions/username/:Mehul'
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
