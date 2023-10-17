@@ -19,7 +19,7 @@ class CommentService {
       { new: true }
     ) as Query<IPostDocument, IPostDocument>;
     const user: Promise<IUserDocument> = userCache.getUserFromCache(userTo) as Promise<IUserDocument>; //we need comment data in the user cache to send the notification
-    const response: [ICommentDocument, IPostDocument, IPostDocument] = await Promise.all([comments, post, user]); // order matters here
+    const response: [ICommentDocument, IPostDocument, IUserDocument] = await Promise.all([comments, post, user]); // order matters here
 
     // send comments notification
   }
