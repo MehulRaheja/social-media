@@ -1,11 +1,13 @@
 import { UserCache } from './../../../shared/services/redis/user.cache';
 import { FollowerCache } from './../../../shared/services/redis/follower.cache';
-import { HTTP_STATUS } from 'http-status-codes';
+import HTTP_STATUS from 'http-status-codes';
 import { Request, Response } from 'express';
-import { ObjectId } from 'mongodb';
 import { IUserDocument } from '@user/interfaces/user.interface';
 import { IFollowerData } from '@follower/interfaces/follower.interface';
 import mongoose from 'mongoose';
+import { socketIOFollowerObject } from '@socket/follower';
+import { followerQueue } from '@service/queues/follower.queue';
+import { ObjectId } from 'mongodb';
 
 const followerCache: FollowerCache = new FollowerCache();
 const userCache: UserCache = new UserCache();
@@ -25,13 +27,19 @@ export class Add {
 
     const followerObjectId: ObjectId = new ObjectId();
     const addFolloweeData: IFollowerData = Add.prototype.userData(response[0]);
-    // send data to client with socket (pending)
+    socketIOFollowerObject.emit('add follower', addFolloweeData);
 
     const addFollowerToCache: Promise<void> = followerCache.saveFollowerToCache(`followers:${req.currentUser!.userId}`, `${followerId}`);
     const addFolloweeToCache: Promise<void> = followerCache.saveFollowerToCache(`followers:${followerId}`, `${req.currentUser!.userId}`);
     await Promise.all([addFollowerToCache, addFolloweeToCache]);
 
     // send data to queue
+    followerQueue.addFollowerJob('addFollowerToDB', {
+      keyOne: `${req.currentUser!.userId}`,
+      keyTwo: `${followerId}`,
+      username: req.currentUser!.username,
+      followerDocumentId: followerObjectId
+    });
 
     res.status(HTTP_STATUS.OK).json({message: 'Following user now'});
   }
