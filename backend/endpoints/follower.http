@@ -8,3 +8,11 @@ Accept: application/json
 withCredentials: true
 
 {}
+
+###
+PUT  {{baseUrl}}/{{urlPath}}/user/unfollow/:followerId
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+{}
