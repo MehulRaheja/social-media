@@ -29,7 +29,7 @@ export class Add {
     const addFolloweeData: IFollowerData = Add.prototype.userData(response[0]);
     socketIOFollowerObject.emit('add follower', addFolloweeData);
 
-    const addFollowerToCache: Promise<void> = followerCache.saveFollowerToCache(`followers:${req.currentUser!.userId}`, `${followerId}`);
+    const addFollowerToCache: Promise<void> = followerCache.saveFollowerToCache(`following:${req.currentUser!.userId}`, `${followerId}`);
     const addFolloweeToCache: Promise<void> = followerCache.saveFollowerToCache(`followers:${followerId}`, `${req.currentUser!.userId}`);
     await Promise.all([addFollowerToCache, addFolloweeToCache]);
 
