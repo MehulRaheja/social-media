@@ -16,3 +16,19 @@ Accept: application/json
 withCredentials: true
 
 {}
+
+###
+GET  {{baseUrl}}/{{urlPath}}/user/following
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+{}
+
+###
+GET  {{baseUrl}}/{{urlPath}}/user/followers/6535f24ac1b43ae7c35b297c
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+{}
