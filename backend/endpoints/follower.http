@@ -32,3 +32,19 @@ Accept: application/json
 withCredentials: true
 
 {}
+
+###
+PUT  {{baseUrl}}/{{urlPath}}/user/block/6535f24ac1b43ae7c35b297c
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+{}
+
+###
+PUT  {{baseUrl}}/{{urlPath}}/user/unblock/6535f24ac1b43ae7c35b297c
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+{}
