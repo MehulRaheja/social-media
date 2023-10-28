@@ -1,10 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Helpers } from '@global/helpers/helpers';
+import { INotificationDocument, INotificationTemplate } from '@notification/interfaces/notification.interface';
+import { NotificationModel } from '@notification/models/notificaiton.schema';
 import { IPostDocument } from '@post/interfaces/post.interface';
 import { PostModel } from '@post/models/post.schema';
 import { IQueryReaction, IReactionDocument, IReactionJob } from '@reaction/interfaces/reaction.interface';
 import { ReactionModel } from '@reaction/models/reaction.schema';
+import { notificationTemplate } from '@service/emails/templates/notifications/notification-template';
+import { emailQueue } from '@service/queues/email.queue';
 import { UserCache } from '@service/redis/user.cache';
+import { socketIONotificationObject } from '@socket/notification';
 import { IUserDocument } from '@user/interfaces/user.interface';
 import { omit } from 'lodash';
 import mongoose from 'mongoose';
@@ -36,6 +40,33 @@ class ReactionService {
     ]) as unknown as [IUserDocument, IReactionDocument, IPostDocument];
 
     // send reaction notification
+    if(updateReaction[0]?.notifications.reactions && userTo !== userFrom) { // userFrom !== userTo is to check that user doesn't receive any notification from its own actions
+      const notificationModel: INotificationDocument = new NotificationModel(); // because we want to use our own defined method, we need to initiate the notification model class like this
+      const notifications = await notificationModel.insertNotification({
+        userFrom: userFrom as string,
+        userTo: userTo as string,
+        message: `${username} reacted to your post.`,
+        notificationType: 'reactions',
+        entityId: new mongoose.Types.ObjectId(postId),
+        createdItemId: new mongoose.Types.ObjectId(updateReaction[1]._id!),
+        createdAt: new Date(),
+        comment: '',
+        post: updateReaction[2].post,
+        imgId: updateReaction[2].imgId!,
+        imgVersion: updateReaction[2].imgVersion!,
+        gifUrl: updateReaction[2].gifUrl!,
+        reaction: type!
+      });
+      socketIONotificationObject.emit('insert notification', notifications, { userTo });
+      // send to email queue
+      const templateParams: INotificationTemplate = {
+        username: updateReaction[0].username!,
+        message: `${username} reacted to your post.`,
+        header: 'Post Reaction Notification'
+      };
+      const template: string = notificationTemplate.notificationMessageTemplate(templateParams);
+      emailQueue.addEmailJob('reactionsEmail', { receiverEmail: updateReaction[0].email!, template, subject: 'Post Reaction Notification'});
+    }
   }
 
   public async removeReactionDataFromDB(reactionData: IReactionJob): Promise<void> {
