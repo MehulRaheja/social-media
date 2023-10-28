@@ -1,14 +1,18 @@
-import { IFollowerData } from '@follower/interfaces/follower.interface';
+import { IFollowerData, IFollowerDocument } from '@follower/interfaces/follower.interface';
 import { FollowerModel } from '@follower/models/follower.schema';
 import { INotificationDocument, INotificationTemplate } from '@notification/interfaces/notification.interface';
 import { NotificationModel } from '@notification/models/notificaiton.schema';
+import { IQueryComplete, IQueryDeleted } from '@post/interfaces/post.interface';
 import { notificationTemplate } from '@service/emails/templates/notifications/notification-template';
 import { emailQueue } from '@service/queues/email.queue';
+import { UserCache } from '@service/redis/user.cache';
 import { socketIONotificationObject } from '@socket/notification';
 import { IUserDocument } from '@user/interfaces/user.interface';
 import { UserModel } from '@user/models/user.schema';
 import { ObjectId } from 'mongodb';
-import mongoose from 'mongoose';
+import mongoose, { Query } from 'mongoose';
+
+const userCache: UserCache = new UserCache();
 
 class FollowerService {
   public async addFollowerToDB(userId: string, followeeId: string, username: string, followerDocumentId: ObjectId): Promise<void> {
@@ -36,9 +40,9 @@ class FollowerService {
       }
     ]);
 
-    const response: [mongoose.mongo.BulkWriteResult, IUserDocument | null] = await Promise.all([users, UserModel.findOne({ _id: followeeId })]);
+    const response: [mongoose.mongo.BulkWriteResult, IUserDocument | null] = await Promise.all([users, userCache.getUserFromCache(followeeId)]);
 
-    if(response[1]?.notifications.follows && userId !== followeeId) { // userFrom !== userTo is to check that user doesn't receive any notification from its own actions
+    if(response[1]?.notifications.follows && userId !== followeeId) { // userId !== followeeId is to check that user doesn't receive any notification from its own actions
       const notificationModel: INotificationDocument = new NotificationModel(); // because we want to use our own defined method, we need to initiate the notification model class like this
       const notifications = await notificationModel.insertNotification({
         userFrom: userId,
@@ -63,6 +67,7 @@ class FollowerService {
         header: 'Follower Notification'
       };
       const template: string = notificationTemplate.notificationMessageTemplate(templateParams);
+      console.log(response[1]);
       emailQueue.addEmailJob('followersEmail', { receiverEmail: response[1].email!, template, subject: `${username} is now following you.`});
     }
   }
@@ -71,7 +76,7 @@ class FollowerService {
     const followeeObjectId: ObjectId = new mongoose.Types.ObjectId(followeeId);
     const followerObjectId: ObjectId = new mongoose.Types.ObjectId(followerId);
 
-    const unfollow = FollowerModel.deleteOne({
+    const unfollow: Query<IQueryComplete & IQueryDeleted, IFollowerDocument> = FollowerModel.deleteOne({
       followeeId: followeeObjectId,
       followerId: followerObjectId
     });
