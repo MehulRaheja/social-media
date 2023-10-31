@@ -80,7 +80,7 @@ export class PostCache extends BaseCache {
     }
   }
 
-  // we implement pagination here because we don't want to get all the posts at once
+  // we have implemented pagination here because we don't want to get all the posts at once
   // we want to get posts in reverse order latest first
   public async getPostsFromCache(key: string, start: number, end: number): Promise<IPostDocument[]> {
     try {
