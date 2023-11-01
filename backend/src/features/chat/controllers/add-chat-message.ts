@@ -15,6 +15,7 @@ import { Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 import { MessageCache } from '@service/redis/message.cache';
+import { chatQueue } from '@service/queues/chat.queue';
 
 const userCache: UserCache = new UserCache();
 const messageCache: MessageCache = new MessageCache();
@@ -86,9 +87,24 @@ export class Add {
     await messageCache.addChatListToCache(`${receiverId}`, `${req.currentUser!.userId}`, `${conversationObjectId}`);
 
     // 3 - add message data to cache
+    await messageCache.addChatMessageToCache(`${conversationObjectId}`, messageData);
+
     // 4 - add message to chat queue
+    chatQueue.addChatJob('addChatMessageToDB', messageData);
 
     res.status(HTTP_STATUS.OK).json({ message: 'Message added', conversationId: conversationObjectId});
+  }
+
+  public async addChatUsers(req: Request, res: Response): Promise<void> {
+    const chatUsers = await messageCache.addChatUsersToCache(req.body);
+    socketIOChatObject.emit('add chat users', chatUsers);
+    res.status(HTTP_STATUS.OK).json({ message: 'Users added'});
+  }
+
+  public async removeChatUsers(req: Request, res: Response): Promise<void> {
+    const chatUsers = await messageCache.removeChatUsersFromCache(req.body);
+    socketIOChatObject.emit('add chat users', chatUsers);
+    res.status(HTTP_STATUS.OK).json({ message: 'Users removed'});
   }
 
   private emitSocketIOEvent(data: IMessageData): void {

@@ -3,6 +3,8 @@ import Logger from 'bunyan';
 import { BaseCache } from '@service/redis/base.cache';
 import { ServerError } from '@global/helpers/error-handler';
 import { findIndex } from 'lodash';
+import { IChatList, IChatUsers, IMessageData } from '@chat/interfaces/chat.interface';
+import { Helpers } from '@global/helpers/helpers';
 
 const log: Logger = config.createLogger('messageCache');
 
@@ -29,5 +31,88 @@ export class MessageCache extends BaseCache {
       log.error(error);
       throw new ServerError('Server error. Try again');
     }
+  }
+
+  public async addChatMessageToCache(conversationId: string, value: IMessageData): Promise<void> {
+    try {
+      if(!this.client.isOpen){
+        await this.client.connect();
+      }
+      await this.client.RPUSH(`messages:${conversationId}`, JSON.stringify(value)); // add data to chat list to the right, otherwise we have to sort data when we retrieve chat list
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again');
+    }
+  }
+
+  public async addChatUsersToCache(value: IChatUsers): Promise<IChatUsers[]> {
+    try {
+      if(!this.client.isOpen){
+        await this.client.connect();
+      }
+      const users: IChatUsers[] = await this.getChatUsersList();
+      const usersIndex: number = findIndex(users, (listItem: IChatUsers) => JSON.stringify(listItem) === JSON.stringify(value));
+      let chatUsers: IChatUsers[] = [];
+      if(usersIndex === -1) {
+        await this.client.RPUSH('chatUsers', JSON.stringify(value));
+        chatUsers = await this.getChatUsersList();
+      } else {
+        chatUsers = users;
+      }
+      return chatUsers;
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again');
+    }
+  }
+
+  public async removeChatUsersFromCache(value: IChatUsers): Promise<IChatUsers[]> {
+    try {
+      if(!this.client.isOpen){
+        await this.client.connect();
+      }
+      const users: IChatUsers[] = await this.getChatUsersList();
+      const usersIndex: number = findIndex(users, (listItem: IChatUsers) => JSON.stringify(listItem) === JSON.stringify(value));
+      let chatUsers: IChatUsers[] = [];
+      if(usersIndex > -1) {
+        await this.client.LREM('chatUsers', usersIndex, JSON.stringify(value));
+        chatUsers = await this.getChatUsersList();
+      } else {
+        chatUsers = users;
+      }
+      return chatUsers;
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again');
+    }
+  }
+
+  public async getUserConversationList(key: string): Promise<IMessageData[]> {
+    try {
+      if(!this.client.isOpen){
+        await this.client.connect();
+      }
+      const userChatList: string[] = await this.client.LRANGE(`chatList:${key}`, 0, -1);
+      const conversationChatList: IMessageData[] = [];
+      for(const item of userChatList) {
+        const chatItem: IChatList = Helpers.parseJson(item) as IChatList;
+        const lastMessage: string = await this.client.LINDEX(`messages:${chatItem.conversationId}`, -1) as string; // getting last message to show in chat list
+        conversationChatList.push(Helpers.parseJson(lastMessage));
+      }
+      return conversationChatList;
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again');
+    }
+  }
+
+  private async getChatUsersList(): Promise<IChatUsers[]> {
+    const chatUsersList: IChatUsers[] = [];
+    const chatUsers = await this.client.LRANGE('chatUsers', 0, -1);
+    for(const item of chatUsers) {
+      const chatUser: IChatUsers = Helpers.parseJson(item) as IChatUsers;
+      chatUsersList.push(chatUser);
+    }
+    return chatUsersList;
   }
 }
