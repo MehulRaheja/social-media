@@ -14,8 +14,10 @@ import { UploadApiResponse } from 'cloudinary';
 import { Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
+import { MessageCache } from '@service/redis/message.cache';
 
 const userCache: UserCache = new UserCache();
+const messageCache: MessageCache = new MessageCache();
 
 export class Add {
   @joiValidation(addChatSchema)
@@ -78,7 +80,11 @@ export class Add {
     }
 
     // 1 - add sender to chat list in cache
+    await messageCache.addChatListToCache(`${req.currentUser!.userId}`, `${receiverId}`, `${conversationObjectId}`);
+
     // 2 - add receiver to chat list in cache
+    await messageCache.addChatListToCache(`${receiverId}`, `${req.currentUser!.userId}`, `${conversationObjectId}`);
+
     // 3 - add message data to cache
     // 4 - add message to chat queue
 
