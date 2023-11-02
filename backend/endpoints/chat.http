@@ -14,7 +14,7 @@ withCredentials: true
   "receiverUsername": "Mehul2",
   "receiverAvatarColor": "red",
   "receiverProfilePicture": "https://res.cloudinary.com/dlft3yfad/image/upload/v1698034239/6535f239c1b43ae7c35b297a",
-  "body": "Hello. this is a test message",
+  "body": "Hello. this is another test message",
   "gifUrl": "",
   "isRead": true,
   "selectedImage" : ""
@@ -44,6 +44,12 @@ withCredentials: true
 
 ###
 GET {{baseUrl}}/{{urlPath}}/chat/message/conversation-list
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+###
+GET {{baseUrl}}/{{urlPath}}/chat/message/user/6535f24ac1b43ae7c35b297c
 Content-Type: application/json
 Accept: application/json
 withCredentials: true
