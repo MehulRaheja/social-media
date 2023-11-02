@@ -30,3 +30,21 @@ withCredentials: true
   "userOne": "6535f226c1b43ae7c35b2978",
   "userTwo": "6535f24ac1b43ae7c35b297c"
 }
+
+###
+POST {{baseUrl}}/{{urlPath}}/chat/message/remove-chat-users
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+{
+  "userOne": "6535f226c1b43ae7c35b2978",
+  "userTwo": "6535f24ac1b43ae7c35b297c"
+}
+
+###
+GET {{baseUrl}}/{{urlPath}}/chat/message/conversation-list
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
