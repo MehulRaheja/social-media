@@ -54,3 +54,9 @@ Content-Type: application/json
 Accept: application/json
 withCredentials: true
 
+###
+DELETE  {{baseUrl}}/{{urlPath}}/chat/message/mark-as-deleted/65428dee85d7d01f25080064/6535f226c1b43ae7c35b2978/6535f24ac1b43ae7c35b297c/deleteForEveryone
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
