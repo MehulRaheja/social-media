@@ -14,7 +14,7 @@ withCredentials: true
   "receiverUsername": "Mehul2",
   "receiverAvatarColor": "red",
   "receiverProfilePicture": "https://res.cloudinary.com/dlft3yfad/image/upload/v1698034239/6535f239c1b43ae7c35b297a",
-  "body": "Hello. this is another test message 2",
+  "body": "Hello. this is another test message5",
   "gifUrl": "",
   "isRead": false,
   "selectedImage" : ""
@@ -69,4 +69,17 @@ withCredentials: true
 {
   "senderId": "6535f226c1b43ae7c35b2978",
   "receiverId": "6535f24ac1b43ae7c35b297c"
+}
+
+###
+PUT  {{baseUrl}}/{{urlPath}}/chat/message/reaction
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+{
+  "conversationId": "6541d119637791003b47e25e",
+  "messageId": "6548f89811424817376c089e",
+  "reaction": "like",
+  "type": "add"
 }
