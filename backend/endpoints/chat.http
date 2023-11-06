@@ -14,9 +14,9 @@ withCredentials: true
   "receiverUsername": "Mehul2",
   "receiverAvatarColor": "red",
   "receiverProfilePicture": "https://res.cloudinary.com/dlft3yfad/image/upload/v1698034239/6535f239c1b43ae7c35b297a",
-  "body": "Hello. this is another test message",
+  "body": "Hello. this is another test message 2",
   "gifUrl": "",
-  "isRead": true,
+  "isRead": false,
   "selectedImage" : ""
 }
 
@@ -60,3 +60,13 @@ Content-Type: application/json
 Accept: application/json
 withCredentials: true
 
+###
+PUT  {{baseUrl}}/{{urlPath}}/chat/message/mark-as-read
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+{
+  "senderId": "6535f226c1b43ae7c35b2978",
+  "receiverId": "6535f24ac1b43ae7c35b297c"
+}
