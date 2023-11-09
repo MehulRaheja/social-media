@@ -151,5 +151,18 @@ export class UserCache extends BaseCache {
       throw new ServerError('Server error. try again.');
     }
   }
+
+  public async getTotalUsersInCache(): Promise<number> {
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      }
+      const count: number = await this.client.ZCARD('user');
+      return count;
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. try again.');
+    }
+  }
 }
 // by using ZADD we can get all the user properties from redis at the same time. by default redis give one property at a time from hset
