@@ -44,4 +44,8 @@ export class Helpers {
     }
     return list;
   }
+
+  static escapeRegex(text: string): string {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'); // regex to remove some unwanted characters, helps to search users in mongodb
+  }
 }

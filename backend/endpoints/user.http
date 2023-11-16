@@ -24,3 +24,15 @@ GET  {{baseUrl}}/{{urlPath}}/user/profile/posts/Mehul/6535f226c1b43ae7c35b2978/2
 Content-Type: application/json
 Accept: application/json
 withCredentials: true
+
+###
+GET  {{baseUrl}}/{{urlPath}}/user/profile/user/suggestions
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+###
+GET  {{baseUrl}}/{{urlPath}}/user/profile/search/mel
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
