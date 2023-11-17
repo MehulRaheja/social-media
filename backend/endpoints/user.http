@@ -44,9 +44,9 @@ Accept: application/json
 withCredentials: true
 
 {
-  "currentPassword": "12345",
-  "newPassword": "123456",
-  "confirmPassword": "123456"
+  "currentPassword": "123456",
+  "newPassword": "12345",
+  "confirmPassword": "12345"
 }
 
 ###
@@ -56,7 +56,7 @@ Accept: 'application/json'
 withCredentials: true
 
 {
-  "quote": "",
+  "quote": "some quote",
   "work": "",
   "school": "",
   "location": ""
