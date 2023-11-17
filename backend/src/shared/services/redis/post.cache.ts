@@ -32,6 +32,8 @@ export class PostCache extends BaseCache {
       commentsCount,
       imgVersion,
       imgId,
+      videoId,
+      videoVersion,
       privacy,
       reactions,
       createdAt
@@ -53,8 +55,8 @@ export class PostCache extends BaseCache {
       'reactions': JSON.stringify(reactions),
       'imgVersion': `${imgVersion}`,
       'imgId': `${imgId}`,
-      // 'videoId': `${videoId}`,
-      // 'videoVersion': `${videoVersion}`,
+      'videoId': `${videoId}`,
+      'videoVersion': `${videoVersion}`,
       'createdAt': `${createdAt}`
     };
 
@@ -157,6 +159,38 @@ export class PostCache extends BaseCache {
     }
   }
 
+  public async getPostsWithVideoFromCache(key: string, start: number, end: number): Promise<IPostDocument[]> {
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      }
+
+      // returns the array of zadd ids
+      const reply: string[] = await this.client.ZRANGE(key, start, end, { REV: true });
+      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+      for(const value of reply) {
+        multi.HGETALL(`posts:${value}`);
+      }
+
+      // we are expecting replies to return a type of IPostDocument array, so we need to create a type for it which contains all the types that can be expected from replies.
+      const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
+      const postWithVideos: IPostDocument[] = [];
+      for(const post of replies as IPostDocument[]){
+        if(post.videoId && post.videoVersion) {
+          post.commentsCount = Helpers.parseJson(`${post.commentsCount}`) as number;
+          post.reactions = Helpers.parseJson(`${post.reactions}`) as IReactions;
+          post.createdAt = new Date(Helpers.parseJson(`${post.createdAt}`)) as Date;
+          postWithVideos.push(post);
+        }
+      }
+
+      return postWithVideos;
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. try again.');
+    }
+  }
+
   public async getUserPostsFromCache(key: string, uId: number): Promise<IPostDocument[]> {
     try {
       if (!this.client.isOpen) {
@@ -224,7 +258,7 @@ export class PostCache extends BaseCache {
   }
 
   public async updatePostInCache(key: string, updatedPost: IPostDocument): Promise<IPostDocument> {
-    const { post, bgColor, feelings, privacy, gifUrl, imgVersion, imgId, profilePicture } = updatedPost;
+    const { post, bgColor, feelings, privacy, gifUrl, imgVersion, imgId, profilePicture, videoId, videoVersion } = updatedPost;
     const dataToSave = {
       'profilePicture': `${profilePicture}`,
       'post': `${post}`,
@@ -234,6 +268,8 @@ export class PostCache extends BaseCache {
       'gifUrl': `${gifUrl}`,
       'imgVersion': `${imgVersion}`,
       'imgId': `${imgId}`,
+      'videoVersion': `${videoVersion}`,
+      'videoId': `${videoId}`,
     };
     try {
       if (!this.client.isOpen) {
