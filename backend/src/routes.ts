@@ -9,6 +9,7 @@ import { notificationRoutes } from '@notification/routes/notificationRoutes';
 import { postRoutes } from '@post/routes/postRoutes';
 import { reactionRoutes } from '@reaction/routes/reactionRoutes';
 import { serverAdapter } from '@service/queues/base.queue';
+import { healthRoutes } from '@user/routes/healthRoutes';
 import { userRoutes } from '@user/routes/userRoutes';
 import { Application } from 'express';
 
@@ -19,6 +20,11 @@ export default (app: Application) => {
     // this is for GUI of route /queues
     // there is no requirement of BASE_PATH
     app.use('/queues', serverAdapter.getRouter());
+    app.use('', healthRoutes.health()); // while using aws ec2 and load balancer it will be required to check the health of the instance, for healthy route it will return 200
+    app.use('', healthRoutes.env()); // this will display the exact environment on which we are on
+    app.use('', healthRoutes.instance()); // to get the ec2 instance id of currently running service
+    app.use('', healthRoutes.fiboRoutes()); // to put heavy load on the server to check its performance
+
     app.use(BASE_PATH, authRoutes.routes());
     app.use(BASE_PATH, authRoutes.signoutRoute());
 
