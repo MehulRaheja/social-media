@@ -11,6 +11,7 @@ import { createClient } from 'redis';
 import { createAdapter } from '@socket.io/redis-adapter';
 // @socket.io/redis-adapter: if a user who was connected to socket and connects again then this library will maintain the connection
 import Logger from 'bunyan';
+import apiStats from 'swagger-stats';
 import 'express-async-errors';
 import { config } from '@root/config';
 import applicationRoutes from '@root/routes';
@@ -25,7 +26,7 @@ import { SocketIOChatHandler } from '@socket/chat';
 const SERVER_PORT = 5000;
 const log: Logger = config.createLogger('server'); // whenever we see log/error with the name server, means it is coming from server file.
 
-export class ChattyServer {
+export class ServerSetup {
   private app: Application;
 
   constructor(app: Application) {
@@ -37,6 +38,7 @@ export class ChattyServer {
     this.securityMiddleware(this.app);
     this.standardMiddleware(this.app);
     this.routesMiddleware(this.app);
+    this.apiMonitoring(this.app);
     this.globalErrorHandler(this.app);
     this.startServer(this.app);
   }
@@ -72,6 +74,14 @@ export class ChattyServer {
     applicationRoutes(app);
   }
 
+  private apiMonitoring(app: Application): void {
+    app.use(
+      apiStats.getMiddleware({ // we can pass multiple options here
+        uriPath: '/api-monitoring' // for api monitoring in the browser
+      })
+    );
+  }
+
   // Global error handler to handle entire application's errors and send it to client
   private globalErrorHandler(app: Application): void {
     // finding url related errors for all the routes
@@ -93,6 +103,9 @@ export class ChattyServer {
   }
 
   private async startServer(app: Application): Promise<void> {
+    if(!config.JWT_TOKEN){
+      throw new Error('JWT_TOKEN must be provided');
+    }
     try {
       const httpServer: http.Server = new http.Server(app);
       const socketIO: Server = await this.createSocketIO(httpServer);
@@ -121,8 +134,8 @@ export class ChattyServer {
   }
 
   private startHttpServer(httpServer: http.Server): void {
+    log.info(`Worker with process id of ${process.pid} has started...`);
     log.info(`Server has started with process ${process.pid}`);
-
     httpServer.listen(SERVER_PORT, () => {
       log.info(`Server running on port ${SERVER_PORT}`);
     });

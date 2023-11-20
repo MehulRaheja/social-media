@@ -4,6 +4,10 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "start": "pm2 start ./build/src/app.js -i 5 --attach --watch | .\\node_modules\\.bin\\bunyan",
+    "start:original": "set NODE_ENV=development pm2 start ./build/src/app.js -i 5 --attach --watch | .\\node_modules\\.bin\\bunyan",
+    "stop": "pm2 stop all",
+    "delete": "pm2 delete all",
     "dev": "nodemon -r tsconfig-paths/register src/app.ts | .\\node_modules\\.bin\\bunyan",
     "lint:check": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
@@ -11,7 +15,8 @@
     "prettier:fix": "prettier --write src/**/*.{ts,json}",
     "test": "jest --coverage=true -w=1 --forceExit --detectOpenHandles --watchAll=true",
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-    "seeds:dev": "npx ts-node src/seeds.ts"
+    "seeds:dev": "npx ts-node src/seeds.ts",
+    "seeds:prod": "npx ts-node ./build/src/seeds.js"
   },
   "keywords": [],
   "author": "Mehul Raheja",
@@ -52,6 +57,7 @@
     "nodemailer": "^6.9.4",
     "redis": "^4.6.8",
     "socket.io": "^4.7.2",
+    "swagger-stats": "^0.99.7",
     "typescript": "^5.2.2",
     "typescript-transform-paths": "^3.4.6"
   },
@@ -72,6 +78,7 @@
     "@types/lodash": "^4.14.197",
     "@types/nodemailer": "^6.4.9",
     "@types/redis-info": "^3.0.0",
+    "@types/swagger-stats": "^0.95.11",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^6.5.0",
     "eslint": "^8.48.0",

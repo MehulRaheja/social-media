@@ -47,14 +47,14 @@ class HealthRoutes {
       const start: number = performance.now();
       const result: number = this.fibo(parseInt(num, 10));
       const end: number = performance.now();
-      const response = await axios({
-        method: 'get',
-        url: config.EC2_URL // url from aws to get the instance id
-      });
+      // const response = await axios({
+      //   method: 'get',
+      //   url: config.EC2_URL // url from aws to get the instance id
+      // });
       res.status(HTTP_STATUS.OK).send(
-        `Fibonacci series of ${num} is ${result} and it took ${end - start}ms with EC2 instance of ${
-          response.data
-        } and process id ${process.pid} on ${moment().format('LL')}`
+        `Fibonacci series of ${num} is ${result} and it took ${end - start}ms
+
+        and process id ${process.pid} on ${moment().format('LL')}`
       );
     });
 
