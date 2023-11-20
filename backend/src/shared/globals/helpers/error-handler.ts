@@ -26,10 +26,10 @@ export abstract class CustomError extends Error {
     return {
       message: this.message,
       status: this.status,
-      statusCode: this.statusCode,
-    }
+      statusCode: this.statusCode
+    };
   }
-};
+}
 
 export class JoiRequestValidationError extends CustomError {
   statusCode = HTTP_STATUS.BAD_REQUEST;

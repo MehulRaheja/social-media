@@ -1,4 +1,4 @@
-import { Application, json, urlencoded, Response, Request, NextFunction} from 'express';
+import { Application, json, urlencoded, Response, Request, NextFunction } from 'express';
 import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -11,15 +11,22 @@ import { createClient } from 'redis';
 import { createAdapter } from '@socket.io/redis-adapter';
 // @socket.io/redis-adapter: if a user who was connected to socket and connects again then this library will maintain the connection
 import Logger from 'bunyan';
+import apiStats from 'swagger-stats';
 import 'express-async-errors';
-import { config } from './config';
-import applicationRoutes from './routes';
-import { CustomError, IErrorResponse } from './shared/globals/helpers/error-handler';
+import { config } from '@root/config';
+import applicationRoutes from '@root/routes';
+import { CustomError, IErrorResponse } from '@global/helpers/error-handler';
+import { SocketIOPostHandler } from '@socket/post';
+import { SocketIOFollowerHandler } from '@socket/follower';
+import { SocketIOUserHandler } from '@socket/user';
+import { SocketIONotificationHandler } from '@socket/notification';
+import { SocketIOImageHandler } from '@socket/image';
+import { SocketIOChatHandler } from '@socket/chat';
 
 const SERVER_PORT = 5000;
 const log: Logger = config.createLogger('server'); // whenever we see log/error with the name server, means it is coming from server file.
 
-export class ChattyServer {
+export class ServerSetup {
   private app: Application;
 
   constructor(app: Application) {
@@ -31,6 +38,7 @@ export class ChattyServer {
     this.securityMiddleware(this.app);
     this.standardMiddleware(this.app);
     this.routesMiddleware(this.app);
+    this.apiMonitoring(this.app);
     this.globalErrorHandler(this.app);
     this.startServer(this.app);
   }
@@ -41,7 +49,7 @@ export class ChattyServer {
         name: 'session', // while applying load-balancer on aws this name will be required
         keys: [config.SECRET_KEY_ONE!, config.SECRET_KEY_TWO!], // ! will remove the error
         maxAge: 24 * 7 * 3600000, // cookie will be valid for 7 days
-        secure: config.NODE_ENV !== 'development' // false means it can be used for http as well, it okay for local environment
+        secure: config.NODE_ENV !== 'development' // false means it can be used for http as well, it's okay for local environment
       })
     );
     app.use(hpp());
@@ -49,9 +57,9 @@ export class ChattyServer {
     app.use(
       cors({
         origin: config.CLIENT_URL, // later '*' will be replaced client url
-        credentials: true, // to use cookie set this to true
+        credentials: true, // to use cookie, set this to true
         optionsSuccessStatus: 200,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
       })
     );
   }
@@ -66,20 +74,28 @@ export class ChattyServer {
     applicationRoutes(app);
   }
 
+  private apiMonitoring(app: Application): void {
+    app.use(
+      apiStats.getMiddleware({ // we can pass multiple options here
+        uriPath: '/api-monitoring' // for api monitoring in the browser
+      })
+    );
+  }
+
   // Global error handler to handle entire application's errors and send it to client
   private globalErrorHandler(app: Application): void {
     // finding url related errors for all the routes
 
     // throwing error when requested url is not found
     app.all('*', (req: Request, res: Response) => {
-      res.status(HTTP_STATUS.NOT_FOUND).json({message: `${req.originalUrl} not found`});
+      res.status(HTTP_STATUS.NOT_FOUND).json({ message: `${req.originalUrl} not found` });
     });
 
     // if it relates to any error class which is created extending CustomError class then this method will throw that error
     // we put _ in front of req because we are not using it
     app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
       log.error(error);
-      if(error instanceof CustomError) {
+      if (error instanceof CustomError) {
         return res.status(error.statusCode).json(error.serializeErrors());
       }
       next();
@@ -87,11 +103,14 @@ export class ChattyServer {
   }
 
   private async startServer(app: Application): Promise<void> {
+    if(!config.JWT_TOKEN){
+      throw new Error('JWT_TOKEN must be provided');
+    }
     try {
       const httpServer: http.Server = new http.Server(app);
-      // const socketIO: Server = await this.createSocketIO(httpServer);
-      this.startHttpServer(httpServer); 
-      // this.socketIOConnetions(socketIO);
+      const socketIO: Server = await this.createSocketIO(httpServer);
+      this.startHttpServer(httpServer);
+      this.socketIOConnetions(socketIO);
     } catch (error) {
       log.error(error);
     }
@@ -102,12 +121,12 @@ export class ChattyServer {
     const io: Server = new Server(httpServer, {
       cors: {
         origin: config.CLIENT_URL,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
       }
     });
 
     // create redis client
-    const pubClient = createClient({ url: config.REDIS_CLIENT}); // this will create client for publishing
+    const pubClient = createClient({ url: config.REDIS_CLIENT }); // this will create client for publishing
     const subClient = pubClient.duplicate(); // this will create client for subscription
     await Promise.all([pubClient.connect(), subClient.connect()]);
     io.adapter(createAdapter(pubClient, subClient));
@@ -115,14 +134,27 @@ export class ChattyServer {
   }
 
   private startHttpServer(httpServer: http.Server): void {
+    log.info(`Worker with process id of ${process.pid} has started...`);
     log.info(`Server has started with process ${process.pid}`);
-    
     httpServer.listen(SERVER_PORT, () => {
       log.info(`Server running on port ${SERVER_PORT}`);
     });
   }
 
   // every socket connection we'll create will be define here
-  private socketIOConnetions(io: Server): void {}
+  private socketIOConnetions(io: Server): void {
+    const postSocketHandler: SocketIOPostHandler = new SocketIOPostHandler(io);
+    const followerSocketHandler: SocketIOFollowerHandler = new SocketIOFollowerHandler(io);
+    const userSocketHandler: SocketIOUserHandler = new SocketIOUserHandler(io);
+    const notificationSocketHandler: SocketIONotificationHandler = new SocketIONotificationHandler();
+    const imageSocketHandler: SocketIOImageHandler = new SocketIOImageHandler();
+    const chatSocketHandler: SocketIOChatHandler = new SocketIOChatHandler(io);
 
+    postSocketHandler.listen();
+    followerSocketHandler.listen();
+    userSocketHandler.listen();
+    notificationSocketHandler.listen(io);
+    imageSocketHandler.listen(io);
+    chatSocketHandler.listen();
+  }
 }
