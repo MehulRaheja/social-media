@@ -1,0 +1,16 @@
+terraform --version
+terraform init
+terraform fmt
+terraform validate
+terraform plan
+terraform apply -auto-approve // -auto-approve : to provide access for all the approvals
+terraform destroy -auto-approve
+
+
+// remove nodemodules before doing this
+zip socialiser.zip -r . // to zip all the contents of current directory
+
+// upload file to s3 of current directory
+// file name: socialiser.zip
+// s3 bucket: socialiser-server-default-app
+aws --region ap-south-1 s3 cp socialiser.zip s3://socialiser-server-default-app

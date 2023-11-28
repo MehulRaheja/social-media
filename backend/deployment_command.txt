@@ -1,0 +1,8 @@
+aws deploy create-deployment \
+    --region ap-south-1 \
+    --application-name socialiser-server-default-app \
+    --deployment-config-name CodeDeployDefault.AllAtOnce \
+    --deployment-group-name socialiser-server-default-group \
+    --s3-location bucket=socialiser-server-default-app,bundleType=zip,key=socialiser.zip
+
+copy and deploy above command to redeploy the updated code inside socialiser.zip file
