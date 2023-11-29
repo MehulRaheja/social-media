@@ -93,7 +93,7 @@ variable "elasticache_node_type" {
 variable "elasticache_parameter_group_name" {
   description = "Elasticache Parameter Group Name"
   type        = string
-  default     = "default.redis7.x"
+  default     = "default.redis7"
 }
 
 # t2.medium is not under free tier, use wisely

@@ -16,5 +16,6 @@ hooks:
     - location: scripts/application_start.sh
       timeout: 300
       runas: root
+file_exists_behavior: OVERWRITE
 
 # in the root folder codedeploy will look for this file

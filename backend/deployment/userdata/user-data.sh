@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# this function checks the program we are looking for is already installed or not
-# it will return 1 if program exists and 0 otherwise
-function program_is_installed {
+function program_is_installed { # it will return 1 if program exists and 0 otherwise
   local return_=1
 
   type $1 >/dev/null 2>&1 || { local return_=0; }
@@ -48,3 +46,5 @@ unzip env-file.zip # because env file come to us in zip format
 cp .env.develop .env # copy .env.production file and create a new file .env
 npm run build
 npm run start
+
+# this function checks the program we are looking for is already installed or not
