@@ -3,7 +3,7 @@
 terraform {
   backend "s3" {
     bucket  = "socialiser-terraform-state"
-    key     = "staging/socialiser.tfstate" # in the s3 bucket it will go inside staging directory and create socialiser.tfstate file
+    key     = "production/socialiser.tfstate" # in the s3 bucket it will go inside production directory and create socialiser.tfstate file
     region  = "ap-south-1"                 # variable does not work here
     encrypt = true                         # encryption of the s3 state is enabled
   }

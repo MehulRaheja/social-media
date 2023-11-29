@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-aws s3 sync s3://socialiser-env-files/staging . # it will check for staging folder inside socialiser-env-files bucket and download all the content of the folder
+aws s3 sync s3://socialiser-env-files/production . # it will check for production folder inside socialiser-env-files bucket and download all the content of the folder
 unzip env-file.zip # because env file come to us in zip format
-cp .env.staging .env # copy .env.staging file and create a new file .env
-rm .env.staging # delete .env.staging
+cp .env.production .env # copy .env.production file and create a new file .env
+rm .env.production # delete .env.production
 sed -i -e "s|\(^REDIS_HOST=\).*|REDIS_HOST=redis://$ELASTICACHE_ENDPOINT:6379|g" .env # update REDIS_HOST in the .env file, ELASTICACHE_ENDPOINT is specified in elasticache.tf file
 rm -rf env-file.zip
-cp .env .env.staging
-zip env-file.zip .env.staging
-aws --region ap-south-1 s3 cp env-file.zip s3://socialiser-env-files/staging/ # replace the file inside s3 bucket
+cp .env .env.production
+zip env-file.zip .env.production
+aws --region ap-south-1 s3 cp env-file.zip s3://socialiser-env-files/production/ # replace the file inside s3 bucket
 rm -rf .env*
 rm -rf env-file.zip
 
