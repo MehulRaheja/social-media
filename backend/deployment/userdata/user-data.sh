@@ -38,12 +38,12 @@ fi
 
 cd /home/ec2-user
 
-git clone -b development https://github.com/MehulRaheja/social-media.git # we are taking clone from the development branch, if the environment is staging or prod then we take clone from respective branch
+git clone -b staging https://github.com/MehulRaheja/social-media.git # we are taking clone from the staging branch, if the environment is staging or prod then we take clone from respective branch
 cd social-media/backend
 npm install
-aws s3 sync s3://socialiser-env-files/develop . # it will check for develop folder inside socialiser-env-files bucket and download all the content of the folder
+aws s3 sync s3://socialiser-env-files/staging . # it will check for staging folder inside socialiser-env-files bucket and download all the content of the folder
 unzip env-file.zip # because env file come to us in zip format
-cp .env.develop .env # copy .env.production file and create a new file .env
+cp .env.staging .env # copy .env.production file and create a new file .env
 npm run build
 npm run start
 
