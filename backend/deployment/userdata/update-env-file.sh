@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 aws s3 sync s3://socialiser-env-files/develop . # it will check for develop folder inside socialiser-env-files bucket and download all the content of the folder
 unzip env-file.zip # because env file come to us in zip format
