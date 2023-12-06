@@ -65,7 +65,7 @@
     "react-app-alias": "^2.2.2"
   },
   "jest": {
-    "collectionCoverageFrom": [
+    "collectCoverageFrom": [
       "src/**/*.js",
       "!src/**/test/*.js?(x)",
       "!**/node_modules/**"
