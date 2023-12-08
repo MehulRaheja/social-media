@@ -8,4 +8,9 @@ export const signupMock = rest.post(`${BASE_URL}/signup`, (req, res, ctx) => {
   return res(ctx.json(result));
 });
 
-export const authHandlers = [signupMock];
+export const signupMockError = rest.post(`${BASE_URL}/signup`, (req, res, ctx) => {
+  const result = { message: 'Invalid credentials', user: existingUser, token: userJwt };
+  return res(ctx.status(400), ctx.json(result));
+});
+
+export const authHandlers = [signupMock, signupMockError];
