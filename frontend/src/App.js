@@ -23,3 +23,7 @@ export default App;
 // loaders whatever you need.
 
 // react-app-alias: This will allow us to set some alias.
+
+// CRA uses @testing-library/jest-dom, @testing-library/react and @testing-library/user-event for testing and CRA already did the basic setup.
+// msw(mock service worker) library is used to mock the backend apis
+// jest configuration are added in package.json instead of a separate file
