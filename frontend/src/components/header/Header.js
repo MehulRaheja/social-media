@@ -7,25 +7,50 @@ import { useEffect, useState, useRef } from 'react';
 import { Utils } from '@services/utils/utils.service';
 import useDetectOutsideClick from '@hooks/useDetectOutsideClick';
 import MessageSidebar from '@components/message-sidebar/MessageSidebar';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Dropdown from '@components/dropdown/Dropdown';
+import useEffectOnce from '@hooks/useEffectOnce';
+import { ProfileUtils } from '@services/utils/profile-utils.service';
+import { useNavigate } from 'react-router-dom';
+import useLocalStorage from '@hooks/useLocalStorage';
+import useSessionStorage from '@hooks/useSessionStorage';
+import { userService } from '@services/api/user/user.service';
 
 const Header = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { profile } = useSelector((state) => state.user);
   const [environment, setEnvironment] = useState('');
+  const [settings, setSettings] = useState([]);
   const messageRef = useRef(null);
   const notificationRef = useRef(null);
   const settingsRef = useRef(null);
   const [isMessageActive, setIsMessageActive] = useDetectOutsideClick(messageRef, false);
   const [isNotificationActive, setIsNotificationActive] = useDetectOutsideClick(notificationRef, false);
   const [isSettingsActive, setIsSettingsActive] = useDetectOutsideClick(settingsRef, false);
+  const [deleteStorageUsername] = useLocalStorage('username', 'delete');
+  const [setLoggedIn] = useLocalStorage('keepLoggedIn', 'set');
+  const [deleteSessionPageReload] = useSessionStorage('pageReload', 'delete');
 
   const backgroundColor = `${environment === 'DEV' ? '#50b5ff' : environment === 'STG' ? '#e9710f' : ''}`;
 
   const openChatPage = () => {};
   const onMarkAsRead = () => {};
   const onDeleteNotification = () => {};
-  const onLogout = () => {};
+  const onLogout = async () => {
+    try {
+      setLoggedIn(false);
+      Utils.clearStore({ dispatch, deleteStorageUsername, deleteSessionPageReload, setLoggedIn });
+      await userService.logoutUser();
+      navigate('/');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffectOnce(() => {
+    Utils.mapSettingsDropdownItems(setSettings);
+  });
 
   useEffect(() => {
     const env = Utils.appEnvironment();
@@ -41,7 +66,7 @@ const Header = () => {
           </div>
         )}
         <div className="header-navbar">
-          <div className="header-image" data-testid="header-image">
+          <div className="header-image" data-testid="header-image" onClick={() => navigate('/app/social/streams')}>
             <img src={logo} className="img-fluid" alt="" />
             <div className="app-name">
               Socialiser
@@ -106,7 +131,7 @@ const Header = () => {
               onClick={() => {
                 setIsMessageActive(false);
                 setIsNotificationActive(false);
-                setIsSettingsActive(true);
+                setIsSettingsActive(!isSettingsActive);
               }}
             >
               <span className="header-list-name profile-image">
@@ -132,11 +157,11 @@ const Header = () => {
                     <Dropdown
                       height={300}
                       style={{ right: '150px', top: '40px' }}
-                      data={[]}
+                      data={settings}
                       notificationCount={0}
                       title="Settings"
                       onLogout={onLogout}
-                      onNavigate={() => {}}
+                      onNavigate={() => ProfileUtils.navigateToProfile(profile, navigate)}
                     />
                   </li>
                 </ul>
