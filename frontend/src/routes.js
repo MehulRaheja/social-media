@@ -1,4 +1,6 @@
+import ProtectedRoute from '@pages/ProtectedRoute';
 import { AuthTabs, ForgotPassword, ResetPassword } from '@pages/auth';
+import Error from '@pages/error/Error';
 import Social from '@pages/social/Social';
 import Chat from '@pages/social/chat/Chat';
 import Followers from '@pages/social/followers/Followers';
@@ -26,7 +28,12 @@ export const AppRouter = () => {
     },
     {
       path: '/app/social',
-      element: <Social />,
+      // ProtectRoute will protect child routes as well
+      element: (
+        <ProtectedRoute>
+          <Social />
+        </ProtectedRoute>
+      ),
       children: [
         {
           path: 'streams',
@@ -61,6 +68,10 @@ export const AppRouter = () => {
           element: <Profile />
         }
       ]
+    },
+    {
+      path: '*',
+      element: <Error />
     }
   ]);
 
