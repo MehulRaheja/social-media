@@ -60,7 +60,7 @@ const Header = () => {
 
   return (
     <>
-      {profile ? (
+      {!profile ? (
         <HeaderSkeleton />
       ) : (
         <div className="header-nav-wrapper" data-testid="header-wrapper">
