@@ -7,7 +7,7 @@
     "@hooks/*": ["src/hooks/*"],
     "@pages/*": ["src/pages/*"],
     "@mocks/*": ["src/mocks/*"],
-    "@assests/*": ["src/assests/*"],
+    "@assets/*": ["src/assets/*"],
     "@colors/*": ["src/colors/*"],
     "@redux/*": ["src/redux-toolkit/*"],
     "@root/*": ["src/*"]

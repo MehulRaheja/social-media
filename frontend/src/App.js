@@ -3,14 +3,49 @@ import { AppRouter } from '@root/routes';
 import '@root/App.scss';
 import { useEffect } from 'react';
 import { socketService } from '@services/socket/socket.service';
+import Toast from '@components/toast/Toast';
 
 const App = () => {
+  const notifications = [
+    // {
+    //   id: 1,
+    //   description: 'This is a success message',
+    //   type: 'success',
+    //   icon: checkIcon,
+    //   backgroundColor: '#5cb85c'
+    // },
+    // {
+    //   id: 2,
+    //   description: 'This is a error message',
+    //   type: 'error',
+    //   icon: errorIcon,
+    //   backgroundColor: '#d9534f'
+    // },
+    // {
+    //   id: 3,
+    //   description: 'This is a info message',
+    //   type: 'info',
+    //   icon: infoIcon,
+    //   backgroundColor: '#5bc0de'
+    // },
+    // {
+    //   id: 4,
+    //   description: 'This is a warning message',
+    //   type: 'warning',
+    //   icon: warningIcon,
+    //   backgroundColor: '#f0ad4e'
+    // }
+  ];
+
   useEffect(() => {
     socketService.setupSocketConnection();
   }, []);
 
   return (
     <>
+      {notifications && notifications.length > 0 && (
+        <Toast position="top-right" toastList={notifications} autoDelete={true} />
+      )}
       <BrowserRouter>
         <AppRouter />
       </BrowserRouter>
