@@ -1,6 +1,7 @@
 import { floor, random } from 'lodash';
 import { avatarColors } from '@services/utils/static.data';
 import { addUser, clearUser } from '@redux/reducers/user/user.reducer';
+import { addNotification, clearNotification } from '@redux/reducers/notifications/notification.reducer';
 
 export class Utils {
   static avatarColor() {
@@ -35,10 +36,18 @@ export class Utils {
 
   static clearStore({ dispatch, deleteStorageUsername, deleteSessionPageReload, setLoggedIn }) {
     dispatch(clearUser());
-    // dispatch clear notification action
+    dispatch(clearNotification());
     deleteStorageUsername();
     deleteSessionPageReload();
     setLoggedIn(false);
+  }
+
+  static dispatchNotification(message, type, dispatch) {
+    dispatch(addNotification({ message, type }));
+  }
+
+  static dispatchClearNotification(dispatch) {
+    dispatch(clearNotification());
   }
 
   static appEnvironment() {

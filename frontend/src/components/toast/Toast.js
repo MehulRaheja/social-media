@@ -3,11 +3,14 @@ import PropTypes from 'prop-types';
 import '@components/toast/Toast.scss';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cloneDeep } from 'lodash';
+import { Utils } from '@services/utils/utils.service';
+import { useDispatch } from 'react-redux';
 
 const Toast = (props) => {
   const { toastList, position, autoDelete, autoDeleteTime = 2000 } = props;
   const [list, setList] = useState(toastList);
   const listData = useRef([]);
+  const dispatch = useDispatch();
 
   const deleteToast = useCallback(() => {
     listData.current = cloneDeep(list);
@@ -15,9 +18,9 @@ const Toast = (props) => {
     setList([...listData.current]);
     if (!listData.current.length) {
       list.length = 0; // if there is no data in listData then we will directly empty the list
-      // dispatch notification
+      Utils.dispatchClearNotification(dispatch);
     }
-  }, [list]);
+  }, [list, dispatch]);
 
   useEffect(() => {
     setList([...toastList]);

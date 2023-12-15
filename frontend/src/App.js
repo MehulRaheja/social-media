@@ -4,38 +4,10 @@ import '@root/App.scss';
 import { useEffect } from 'react';
 import { socketService } from '@services/socket/socket.service';
 import Toast from '@components/toast/Toast';
+import { useSelector } from 'react-redux';
 
 const App = () => {
-  const notifications = [
-    // {
-    //   id: 1,
-    //   description: 'This is a success message',
-    //   type: 'success',
-    //   icon: checkIcon,
-    //   backgroundColor: '#5cb85c'
-    // },
-    // {
-    //   id: 2,
-    //   description: 'This is a error message',
-    //   type: 'error',
-    //   icon: errorIcon,
-    //   backgroundColor: '#d9534f'
-    // },
-    // {
-    //   id: 3,
-    //   description: 'This is a info message',
-    //   type: 'info',
-    //   icon: infoIcon,
-    //   backgroundColor: '#5bc0de'
-    // },
-    // {
-    //   id: 4,
-    //   description: 'This is a warning message',
-    //   type: 'warning',
-    //   icon: warningIcon,
-    //   backgroundColor: '#f0ad4e'
-    // }
-  ];
+  const { notifications } = useSelector((state) => state);
 
   useEffect(() => {
     socketService.setupSocketConnection();
@@ -43,9 +15,7 @@ const App = () => {
 
   return (
     <>
-      {notifications && notifications.length > 0 && (
-        <Toast position="top-right" toastList={notifications} autoDelete={true} />
-      )}
+      {notifications?.length ? <Toast position="top-right" toastList={notifications} autoDelete={true} /> : null}
       <BrowserRouter>
         <AppRouter />
       </BrowserRouter>

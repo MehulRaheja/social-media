@@ -9,7 +9,7 @@ const Social = lazy(() => import('@pages/social/Social'));
 const Chat = lazy(() => import('@pages/social/chat/Chat'));
 const Followers = lazy(() => import('@pages/social/followers/Followers'));
 const Following = lazy(() => import('@pages/social/following/Following'));
-const Notifications = lazy(() => import('@pages/social/notifications/Notifications'));
+const Notifications = lazy(() => import('@pages/social/notifications/Notification'));
 const People = lazy(() => import('@pages/social/people/People'));
 const Photos = lazy(() => import('@pages/social/photos/Photos'));
 const Profile = lazy(() => import('@pages/social/profile/Profile'));
