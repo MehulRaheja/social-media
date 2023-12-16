@@ -1,6 +1,7 @@
 import ProtectedRoute from '@pages/ProtectedRoute';
 import { AuthTabs, ForgotPassword, ResetPassword } from '@pages/auth';
 import Error from '@pages/error/Error';
+import NotificationSkeleton from '@pages/social/notifications/NotificationSkeleton';
 import StreamsSkeleton from '@pages/social/streams/StreamsSkeleton';
 import { Suspense, lazy } from 'react';
 import { useRoutes } from 'react-router-dom';
@@ -90,7 +91,7 @@ export const AppRouter = () => {
         {
           path: 'notifications',
           element: (
-            <Suspense>
+            <Suspense fallback={<NotificationSkeleton />}>
               <Notifications />
             </Suspense>
           )

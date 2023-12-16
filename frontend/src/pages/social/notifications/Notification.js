@@ -34,7 +34,7 @@ const Notification = () => {
 
   const markAsRead = async (notification) => {
     try {
-      NotificationUtils.markMessageAsRead(notification._id);
+      NotificationUtils.markMessageAsRead(notification._id, notification, setNotificationDialogContent);
     } catch (error) {
       Utils.dispatchNotification(error.response.data.message, 'error', dispatch);
     }
