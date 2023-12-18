@@ -7,12 +7,29 @@ import { FaTimes } from 'react-icons/fa';
 import { bgColors } from '@services/utils/static.data';
 import ModalBoxSelection from '@components/posts/post-modal/modal-box-content/ModalBoxSelection';
 import Button from '@components/button/Button';
+import { PostUtils } from '@services/utils/post-utils.service';
 
 const AddPost = () => {
   const { gifModalIsOpen } = useSelector((state) => state.modal);
   const [loading] = useState(false);
   const [postImage] = useState('');
   const [allowedNumberOfCharacters] = useState('100/100');
+  const [textAreaBackground, setTextAreaBackground] = useState('#ffffff');
+  const [postData, setPostData] = useState({
+    post: '',
+    bgColor: textAreaBackground,
+    privacy: '',
+    feelings: '',
+    gifUrl: '',
+    profilePicture: '',
+    image: ''
+  });
+  const [disable, setDisable] = useState(false);
+
+  const selectBackground = (bgColor) => {
+    PostUtils.selectBackground(bgColor, postData, setTextAreaBackground, setPostData, setDisable);
+  };
+
   return (
     <>
       <PostWrapper>
@@ -33,13 +50,17 @@ const AddPost = () => {
 
             {!postImage && (
               <>
-                <div className="modal-box-form" data-testid="modal-box-form">
-                  <div className="main">
+                <div
+                  className="modal-box-form"
+                  data-testid="modal-box-form"
+                  style={{ background: `${textAreaBackground}` }}
+                >
+                  <div className="main" style={{ margin: textAreaBackground !== '#ffffff' ? '0 auto' : '' }}>
                     <div className="flex-row">
                       <div
                         data-testid="editable"
                         name="post"
-                        className="editable flex-item"
+                        className={`editable flex-item ${textAreaBackground !== '#ffffff' ? 'textInputColor' : ''}`}
                         contentEditable={true}
                         data-placeholder="What's on your mind?..."
                       ></div>
@@ -77,6 +98,7 @@ const AddPost = () => {
                     key={index}
                     className={`${color === '#ffffff' ? 'whiteColorBorder' : ''}`}
                     style={{ backgroundColor: `${color}` }}
+                    onClick={() => selectBackground(color)}
                   ></li>
                 ))}
               </ul>
@@ -88,7 +110,7 @@ const AddPost = () => {
             <ModalBoxSelection />
 
             <div className="modal-box-button" data-testid="post-button">
-              <Button label="Create Post" className="post-button" disabled={true} />
+              <Button label="Create Post" className="post-button" disabled={disable} />
             </div>
           </div>
         )}
