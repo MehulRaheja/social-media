@@ -18,5 +18,5 @@ const postSlice = createSlice({
   }
 });
 
-export const { updatePostItem } = postSlice.actions;
+export const { updatePostItem, clearPost } = postSlice.actions;
 export default postSlice.reducer;
