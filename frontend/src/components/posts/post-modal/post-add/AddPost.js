@@ -3,13 +3,16 @@ import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import '@components/posts/post-modal/post-add/AddPost.scss';
 import ModalBoxContent from '@components/posts/post-modal/modal-box-content/ModalBoxContent';
-import { FaTimes } from 'react-icons/fa';
+import { FaArrowLeft, FaTimes } from 'react-icons/fa';
 import { bgColors } from '@services/utils/static.data';
 import ModalBoxSelection from '@components/posts/post-modal/modal-box-content/ModalBoxSelection';
 import Button from '@components/button/Button';
 import { PostUtils } from '@services/utils/post-utils.service';
+import { toggleGifModal } from '@redux/reducers/modal/modal.reducer';
+import Giphy from '@components/giphy/Giphy';
+import PropTypes from 'prop-types';
 
-const AddPost = () => {
+const AddPost = ({ selectedImage }) => {
   const { gifModalIsOpen } = useSelector((state) => state.modal);
   const { gifUrl, image } = useSelector((state) => state.post);
   const [loading] = useState(false);
@@ -26,7 +29,7 @@ const AddPost = () => {
     image: ''
   });
   const [disable, setDisable] = useState(false);
-  const [selectedPostImage, setSelectedPostImage] = useState();
+  const [selectedPostItem, setSelectedPostImage] = useState();
   const counterRef = useRef(null);
   const inputRef = useRef(null);
   const imageInputRef = useRef(null);
@@ -35,7 +38,8 @@ const AddPost = () => {
   const maxNumberOfCharacters = 100;
 
   const selectBackground = (bgColor) => {
-    console.log(selectedPostImage);
+    console.log(selectedPostItem);
+    console.log(selectedImage);
     PostUtils.selectBackground(bgColor, postData, setTextAreaBackground, setPostData, setDisable);
   };
 
@@ -170,10 +174,26 @@ const AddPost = () => {
             </div>
           </div>
         )}
-        {gifModalIsOpen && <div>Gif</div>}
+        {gifModalIsOpen ? (
+          <div className="modal-giphy" data-testid="modal-giphy">
+            <div className="modal-giphy-header">
+              <Button
+                label={<FaArrowLeft />}
+                className="back-button"
+                disabled={false}
+                handleClick={() => dispatch(toggleGifModal(!gifModalIsOpen))}
+              />
+              <h2>Choose a GIF</h2>
+            </div>
+            <hr />
+            <Giphy />
+          </div>
+        ) : null}
       </PostWrapper>
     </>
   );
 };
-
+AddPost.propTypes = {
+  selectedImage: PropTypes.string
+};
 export default AddPost;
