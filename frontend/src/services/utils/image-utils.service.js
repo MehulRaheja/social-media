@@ -42,4 +42,21 @@ export class ImageUtils {
       })
     );
   }
+
+  // to convert file into base64
+  static readAsBase64(file) {
+    const reader = new FileReader();
+    const fileValue = new Promise((resolve, reject) => {
+      reader.addEventListener('load', () => {
+        resolve(reader.result);
+      });
+
+      reader.addEventListener('error', (event) => {
+        reject(event);
+      });
+
+      reader.readAsDataURL(file);
+    });
+    return fileValue;
+  }
 }
