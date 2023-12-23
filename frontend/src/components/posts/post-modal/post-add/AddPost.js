@@ -32,7 +32,7 @@ const AddPost = ({ selectedImage }) => {
     profilePicture: '',
     image: ''
   });
-  const [disable, setDisable] = useState(false);
+  const [disable, setDisable] = useState(true);
   const [apiResponse, setApiResponse] = useState('');
   const [selectedPostImage, setSelectedPostImage] = useState();
   const counterRef = useRef(null);
@@ -50,6 +50,7 @@ const AddPost = ({ selectedImage }) => {
     const currentTextLength = event.target.textContent.length;
     const counter = maxNumberOfCharacters - currentTextLength;
     counterRef.current.textContent = `${counter}/100`;
+    setDisable(currentTextLength <= 0 && !postImage);
     PostUtils.postInputEditable(textContent, postData, setPostData, setDisable);
   };
 
@@ -124,10 +125,15 @@ const AddPost = ({ selectedImage }) => {
   };
 
   useEffect(() => {
+    PostUtils.positionCursor('editable');
+  }, []);
+
+  useEffect(() => {
     if (!loading && apiResponse === 'success') {
       dispatch(closeModal());
     }
-  }, [loading, apiResponse, dispatch]);
+    setDisable(postData.post.length <= 0 && !postImage);
+  }, [loading, apiResponse, dispatch, postData.post.length, postImage]);
 
   useEffect(() => {
     if (gifUrl) {
@@ -176,12 +182,15 @@ const AddPost = ({ selectedImage }) => {
                     <div className="flex-row">
                       <div
                         data-testid="editable"
+                        id="editable"
                         name="post"
                         ref={(el) => {
                           inputRef.current = el;
                           inputRef?.current?.focus();
                         }}
-                        className={`editable flex-item ${textAreaBackground !== '#ffffff' ? 'textInputColor' : ''}`}
+                        className={`editable flex-item ${textAreaBackground !== '#ffffff' ? 'textInputColor' : ''} ${
+                          postData.post.length === 0 && textAreaBackground !== '#ffffff' ? 'defaultInputTextColor' : ''
+                        }`}
                         contentEditable={true}
                         onInput={(e) => postInputEditable(e, e.currentTarget.textContent)}
                         onKeyDown={onKeyDown}
@@ -198,6 +207,7 @@ const AddPost = ({ selectedImage }) => {
                 <div className="modal-box-image-form">
                   <div
                     data-testid="post-editable"
+                    id="editable"
                     name="post"
                     ref={(el) => {
                       imageInputRef.current = el;
@@ -227,7 +237,10 @@ const AddPost = ({ selectedImage }) => {
                     key={index}
                     className={`${color === '#ffffff' ? 'whiteColorBorder' : ''}`}
                     style={{ backgroundColor: `${color}` }}
-                    onClick={() => selectBackground(color)}
+                    onClick={() => {
+                      PostUtils.positionCursor('editable');
+                      selectBackground(color);
+                    }}
                   ></li>
                 ))}
               </ul>

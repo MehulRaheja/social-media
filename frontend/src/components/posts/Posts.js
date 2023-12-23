@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
-import '@components/posts/Po./,sts.scss';
+import '@components/posts/Posts.scss';
 import { useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { Utils } from '@services/utils/utils.service';
 import Post from '@components/posts/post/Post';
+import { PostUtils } from '@services/utils/post-utils.service';
 
 const Posts = ({ allPosts, userFollowing, postsLoading }) => {
   const { profile } = useSelector((state) => state.user);
@@ -15,13 +16,21 @@ const Posts = ({ allPosts, userFollowing, postsLoading }) => {
     setPosts(allPosts);
     setFollowing(userFollowing);
     setLoading(postsLoading);
-  }, [allPosts, userFollowing, postsLoading]);
+  }, [allPosts, userFollowing, postsLoading, following, loading, profile]);
 
   return (
     <div className="posts-container" data-testid="posts">
       {posts.map((post) => (
-        <div key={Utils.generateString(10)} data-testid>
-          <Post post={post} showIcons={false} />
+        <div key={Utils.generateString(10)} data-testid="posts-item">
+          {(!Utils.checkIfUserIsFollowed(profile?.blockedBy, post?.userId) || post?.userId === profile?._id) && (
+            <>
+              {PostUtils.checkPrivacy(post, profile, following) && (
+                <>
+                  <Post post={post} showIcons={false} loading={loading} />
+                </>
+              )}
+            </>
+          )}
         </div>
       ))}
     </div>

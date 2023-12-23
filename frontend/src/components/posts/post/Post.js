@@ -5,7 +5,7 @@ import { FaPencilAlt, FaRegTrashAlt } from 'react-icons/fa';
 import { timeAgo } from '@services/utils/timeago.utils';
 import { find } from 'lodash';
 import { feelingsList, privacyList } from '@services/utils/static.data';
-import '@components/posts/Posts.scss';
+import '@components/posts/post/Post.scss';
 const Post = ({ post, showIcons }) => {
   const getFeeling = (name) => {
     const feeling = find(feelingsList, (data) => data.name === name);
