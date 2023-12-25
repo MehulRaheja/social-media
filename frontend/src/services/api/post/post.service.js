@@ -15,6 +15,11 @@ class PostService {
     const response = await axios.post('/post/image/post', body);
     return response;
   }
+
+  async getReactionsByUsername(username) {
+    const response = await axios.get(`/post/reactions/username/${username}`);
+    return response;
+  }
 }
 
 export const postService = new PostService();
