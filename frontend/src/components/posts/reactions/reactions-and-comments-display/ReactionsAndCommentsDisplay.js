@@ -1,38 +1,94 @@
 import PropTypes from 'prop-types';
 import '@components/posts/reactions/reactions-and-comments-display/ReactionsAndCommentsDisplay.scss';
-import like from '@assets/reactions/like.png';
 import { FaSpinner } from 'react-icons/fa';
+import { Utils } from '@services/utils/utils.service';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { postService } from '@services/api/post/post.service';
+import { reactionsMap } from '@services/utils/static.data';
 
 const ReactionsAndCommentsDisplay = ({ post }) => {
+  const [postReactions, setPostReactions] = useState([]);
+  const [reactions, setReactions] = useState([]);
+  const dispatch = useDispatch();
+
+  const getPostReactions = async () => {
+    try {
+      const response = await postService.getPostReactions(post?._id);
+      setPostReactions(response.data.reactions);
+    } catch (error) {
+      Utils.dispatchNotification(error?.response?.data?.message, 'error', dispatch);
+    }
+  };
+
+  const sumAllReactions = (reactions) => {
+    if (reactions?.length) {
+      const result = reactions.map((item) => item.value).reduce((prev, next) => prev + next);
+      return Utils.shortenLargeNumbers(result);
+    }
+  };
+
+  useEffect(() => {
+    setReactions(Utils.formattedReactions(post?.reactions));
+  }, [post]);
+
   return (
     <div className="reactions-display">
       <div className="reaction">
         <div className="likes-block">
           <div className="likes-block-icons reactions-icon-display">
-            <div className="tooltip-container">
-              <img data-testid="reaction-img" className="reaction-img" src={like} alt="" />
-              <div className="tooltip-container-text tooltip-container-bottom" data-testid="reaction-tooltip">
-                <p className="title">
-                  <img className="title-img" src={like} alt="" />
-                  Love
-                </p>
-                <div className="likes-block-icons-list">
-                  <FaSpinner className="circle-notch" />
-                  <div>
-                    <span>Manny</span>
+            {reactions.length
+              ? reactions.map((reaction) => (
+                  <div className="tooltip-container" key={Utils.generateString(10)}>
+                    <img
+                      data-testid="reaction-img"
+                      className="reaction-img"
+                      src={`${reactionsMap[reaction.type]}`}
+                      alt=""
+                      onMouseEnter={getPostReactions}
+                    />
+                    <div className="tooltip-container-text tooltip-container-bottom" data-testid="reaction-tooltip">
+                      <p className="title">
+                        <img className="title-img" src={`${reactionsMap[reaction.type]}`} alt="" />
+                        {reaction.type.toUpperCase()}
+                      </p>
+                      <div className="likes-block-icons-list">
+                        {postReactions.length === 0 ? <FaSpinner className="circle-notch" /> : null}
+                        {postReactions.length ? (
+                          <>
+                            {postReactions.map((postReaction) => (
+                              <div key={Utils.generateString(10)}>
+                                {postReaction?.type === reaction?.type && (
+                                  <span key={postReaction?._id}>{postReaction.username}</span>
+                                )}
+                              </div>
+                            ))}
+                            {postReactions.length > 20 && <span>and {postReactions.length - 20} others...</span>}
+                          </>
+                        ) : null}
+                      </div>
+                    </div>
                   </div>
-                  <span>and 50 others...</span>
-                </div>
-              </div>
-            </div>
+                ))
+              : null}
           </div>
-          <span data-testid="reactions-count" className="tooltip-container reactions-count">
-            20
+          <span
+            data-testid="reactions-count"
+            className="tooltip-container reactions-count"
+            onMouseEnter={getPostReactions}
+          >
+            {sumAllReactions(reactions)}
             <div className="tooltip-container-text tooltip-container-likes-bottom" data-testid="tooltip-container">
               <div className="likes-block-icons-list">
-                <FaSpinner className="circle-notch" />
-                <span>Stan</span>
-                <span>and 50 others...</span>
+                {postReactions.length === 0 ? <FaSpinner className="circle-notch" /> : null}
+                {postReactions.length ? (
+                  <>
+                    {postReactions.map((postReaction) => (
+                      <span key={Utils.generateString(10)}>{postReaction.username}</span>
+                    ))}
+                    {postReactions.length > 20 && <span>and {postReactions.length - 20} others...</span>}
+                  </>
+                ) : null}
               </div>
             </div>
           </span>
