@@ -9,7 +9,7 @@ import Posts from '@components/posts/Posts';
 import { Utils } from '@services/utils/utils.service';
 import { postService } from '@services/api/post/post.service';
 import { getPosts } from '@redux/api/posts';
-import { uniqBy } from 'lodash';
+import { orderBy, uniqBy } from 'lodash';
 import useInfiniteScroll from '@hooks/useInfiniteScroll';
 import { PostUtils } from '@services/utils/post-utils.service';
 import useLocalStorage from '@hooks/useLocalStorage';
@@ -27,6 +27,7 @@ const Streams = () => {
   const bottomLineRef = useRef();
   const dispatch = useDispatch();
   const storedUsername = useLocalStorage('username', 'get');
+  const [deleteSelectedPostId] = useLocalStorage('selectedPostId', 'delete');
   useInfiniteScroll(bodyRef, bottomLineRef, fetchPostData);
   const PAGE_SIZE = 10;
 
@@ -50,7 +51,8 @@ const Streams = () => {
       if (response.data.posts.length) {
         appPosts = [...posts, ...response.data.posts];
         const allPosts = uniqBy(appPosts, '_id'); // remove all the duplicate posts on basis of _id
-        setPosts(allPosts);
+        const orderedPosts = orderBy(allPosts, ['createdAt', 'desc']);
+        setPosts(orderedPosts);
       }
       setLoading(false);
     } catch (error) {
@@ -69,6 +71,7 @@ const Streams = () => {
 
   useEffectOnce(() => {
     getReactionsByUsername();
+    deleteSelectedPostId();
   });
 
   useEffect(() => {

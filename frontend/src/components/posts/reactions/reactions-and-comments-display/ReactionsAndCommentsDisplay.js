@@ -7,18 +7,28 @@ import { useEffect, useState } from 'react';
 import { postService } from '@services/api/post/post.service';
 import { reactionsMap } from '@services/utils/static.data';
 import { updatePostItem } from '@redux/reducers/post/post.reducer';
-import { toggleReactionsModal } from '@redux/reducers/modal/modal.reducer';
+import { toggleCommentsModal, toggleReactionsModal } from '@redux/reducers/modal/modal.reducer';
 
 const ReactionsAndCommentsDisplay = ({ post }) => {
-  const { reactionsModalIsOpen } = useSelector((state) => state.modal);
+  const { reactionsModalIsOpen, commentsModalIsOpen } = useSelector((state) => state.modal);
   const [postReactions, setPostReactions] = useState([]);
   const [reactions, setReactions] = useState([]);
+  const [postCommentNames, setPostCommentNames] = useState([]);
   const dispatch = useDispatch();
 
   const getPostReactions = async () => {
     try {
       const response = await postService.getPostReactions(post?._id);
       setPostReactions(response.data.reactions);
+    } catch (error) {
+      Utils.dispatchNotification(error?.response?.data?.message, 'error', dispatch);
+    }
+  };
+
+  const getPostCommentsNames = async () => {
+    try {
+      const response = await postService.getPostCommentsNames(post?._id);
+      setPostCommentNames([...new Set(response.data.comments.names)]); // remove duplicate names if there are multiple comments from one user
     } catch (error) {
       Utils.dispatchNotification(error?.response?.data?.message, 'error', dispatch);
     }
@@ -34,6 +44,11 @@ const ReactionsAndCommentsDisplay = ({ post }) => {
   const openReactionsComponent = () => {
     dispatch(updatePostItem(post));
     dispatch(toggleReactionsModal(!reactionsModalIsOpen));
+  };
+
+  const openCommentsComponent = () => {
+    dispatch(updatePostItem(post));
+    dispatch(toggleCommentsModal(!commentsModalIsOpen));
   };
 
   useEffect(() => {
@@ -64,7 +79,7 @@ const ReactionsAndCommentsDisplay = ({ post }) => {
                         {postReactions.length === 0 ? <FaSpinner className="circle-notch" /> : null}
                         {postReactions.length ? (
                           <>
-                            {postReactions.map((postReaction) => (
+                            {postReactions.slice(0, 20).map((postReaction) => (
                               <div key={Utils.generateString(10)}>
                                 {postReaction?.type === reaction?.type && (
                                   <span key={postReaction?._id}>{postReaction.username}</span>
@@ -92,7 +107,7 @@ const ReactionsAndCommentsDisplay = ({ post }) => {
                 {postReactions.length === 0 ? <FaSpinner className="circle-notch" /> : null}
                 {postReactions.length ? (
                   <>
-                    {postReactions.map((postReaction) => (
+                    {postReactions.slice(0, 20).map((postReaction) => (
                       <span key={Utils.generateString(10)}>{postReaction.username}</span>
                     ))}
                     {postReactions.length > 20 && <span>and {postReactions.length - 20} others...</span>}
@@ -103,15 +118,23 @@ const ReactionsAndCommentsDisplay = ({ post }) => {
           </span>
         </div>
       </div>
-      <div className="comment tooltip-container" data-testid="comment-container">
-        <span data-testid="comment-count">20 Comments</span>
+      <div className="comment tooltip-container" data-testid="comment-container" onClick={openCommentsComponent}>
+        {post?.commentsCount > 0 ? (
+          <span onMouseEnter={getPostCommentsNames} data-testid="comment-count">
+            {Utils.shortenLargeNumbers(post.commentsCount)} {`${post.commentsCount === 1 ? 'Comment' : 'Comments'}`}
+          </span>
+        ) : null}
         <div className="tooltip-container-text tooltip-container-comments-bottom" data-testid="comment-tooltip">
           <div className="likes-block-icons-list">
-            <FaSpinner className="circle-notch" />
-            <div>
-              <span>Stan</span>
-              <span>and 50 others...</span>
-            </div>
+            {postCommentNames.length === 0 ? <FaSpinner className="circle-notch" /> : null}
+            {postCommentNames.length ? (
+              <>
+                {postCommentNames.slice(0, 20).map((names) => (
+                  <span key={Utils.generateString(10)}>{names}</span>
+                ))}
+                {postCommentNames.length > 20 && <span>and {postCommentNames.length - 20} others...</span>}
+              </>
+            ) : null}
           </div>
         </div>
       </div>
