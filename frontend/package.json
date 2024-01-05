@@ -10,6 +10,7 @@
     "axios": "^1.6.2",
     "date-fns": "^2.30.0",
     "lodash": "^4.17.21",
+    "millify": "^6.1.0",
     "msw": "^2.0.10",
     "react": "^18.2.0",
     "react-app-rewired": "^2.2.1",

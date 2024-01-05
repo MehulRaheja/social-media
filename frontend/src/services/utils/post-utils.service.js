@@ -3,7 +3,7 @@ import { clearPost, updatePostItem } from '@redux/reducers/post/post.reducer';
 import { postService } from '@services/api/post/post.service';
 import { socketService } from '@services/socket/socket.service';
 import { Utils } from '@services/utils/utils.service';
-import { cloneDeep, findIndex, remove } from 'lodash';
+import { cloneDeep, find, findIndex, remove } from 'lodash';
 
 export class PostUtils {
   static selectBackground(bgColor, postData, setTextAreaBackground, setPostData) {
@@ -72,6 +72,38 @@ export class PostUtils {
       }
     } catch (error) {
       PostUtils.dispatchNotification(error.response.data.message, 'error', setApiResponse, setLoading, dispatch);
+    }
+  }
+
+  static async sendUpdatePostWithImageRequest(fileResult, postId, postData, setApiResponse, setLoading, dispatch) {
+    try {
+      postData.image = fileResult;
+      postData.gifUrl = '';
+      postData.imgId = '';
+      postData.imgVersion = '';
+      const response = await postService.updatePostWithImage(postId, postData);
+      if (response) {
+        PostUtils.dispatchNotification(response.data.message, 'success', setApiResponse, setLoading, dispatch);
+        setTimeout(() => {
+          setApiResponse('success');
+          setLoading(false);
+        }, 3000);
+      }
+      PostUtils.closePostModal(dispatch);
+    } catch (error) {
+      PostUtils.dispatchNotification(error.response.data.message, 'error', setApiResponse, setLoading, dispatch);
+    }
+  }
+
+  static async sendUpdatePostRequest(postId, postData, setApiResponse, setLoading, dispatch) {
+    const response = await postService.updatePost(postId, postData);
+    if (response) {
+      PostUtils.dispatchNotification(response.data.message, 'success', setApiResponse, setLoading, dispatch);
+      setTimeout(() => {
+        setApiResponse('success');
+        setLoading(false);
+      }, 3000);
+      PostUtils.closePostModal(dispatch);
     }
   }
 
