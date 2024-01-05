@@ -89,7 +89,7 @@ export class PostUtils {
           setLoading(false);
         }, 3000);
       }
-      return response;
+      PostUtils.closePostModal(dispatch);
     } catch (error) {
       PostUtils.dispatchNotification(error.response.data.message, 'error', setApiResponse, setLoading, dispatch);
     }
@@ -103,8 +103,8 @@ export class PostUtils {
         setApiResponse('success');
         setLoading(false);
       }, 3000);
+      PostUtils.closePostModal(dispatch);
     }
-    return response;
   }
 
   static checkPrivacy(post, profile, following) {

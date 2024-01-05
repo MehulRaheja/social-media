@@ -15,9 +15,12 @@ import CommentsModal from '@components/posts/comments/comments-modal/CommentsMod
 import { useState } from 'react';
 import ImageModal from '@components/image-modal/ImageModal';
 import { openModal, toggleDeleteDialog } from '@redux/reducers/modal/modal.reducer';
-import { updatePostItem } from '@redux/reducers/post/post.reducer';
+import { clearPost, updatePostItem } from '@redux/reducers/post/post.reducer';
+import Dialog from '@components/dialog/Dialog';
+import { postService } from '@services/api/post/post.service';
 
 const Post = ({ post, showIcons }) => {
+  const { _id } = useSelector((state) => state.post);
   const { reactionsModalIsOpen, commentsModalIsOpen, deleteDialogIsOpen } = useSelector((state) => state.modal);
   const [showImageModal, setShowImageModal] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
@@ -26,12 +29,25 @@ const Post = ({ post, showIcons }) => {
 
   const getFeeling = (name) => {
     const feeling = find(feelingsList, (data) => data.name === name);
-    return feeling?.name;
+    return feeling?.image;
   };
 
   const getPrivacy = (type) => {
     const privacy = find(privacyList, (data) => data.topText === type);
     return privacy?.icon;
+  };
+
+  const deletePost = async () => {
+    try {
+      const response = await postService.deletePost(_id);
+      if (response) {
+        Utils.dispatchNotification(response.data.message, 'success', dispatch);
+        dispatch(toggleDeleteDialog({ toggle: !deleteDialogIsOpen }));
+        dispatch(clearPost());
+      }
+    } catch (error) {
+      Utils.dispatchNotification(error.response.data.message, 'error', dispatch);
+    }
   };
 
   const openPostModal = () => {
@@ -51,6 +67,18 @@ const Post = ({ post, showIcons }) => {
       {showImageModal && (
         <ImageModal image={`${imageUrl}`} onCancel={() => setShowImageModal(!showImageModal)} showArrow={false} />
       )}
+      {deleteDialogIsOpen ? (
+        <Dialog
+          title="Are you sure you want to delete this project?"
+          firstButtonText="Delete"
+          secondButtonText="Cancel"
+          firstBtnHandler={deletePost}
+          secondBtnHandler={() => {
+            dispatch(toggleDeleteDialog({ toggle: !deleteDialogIsOpen }));
+            dispatch(clearPost());
+          }}
+        />
+      ) : null}
       <div className="post-body" data-testid="post">
         <div className="user-post-data">
           <div className="user-post-data-wrap">

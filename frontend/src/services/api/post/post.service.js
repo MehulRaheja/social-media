@@ -67,6 +67,11 @@ class PostService {
     const response = await axios.post('/post/comment', body);
     return response;
   }
+
+  async deletePost(postId) {
+    const response = await axios.delete(`/post/${postId}`);
+    return response;
+  }
 }
 
 export const postService = new PostService();

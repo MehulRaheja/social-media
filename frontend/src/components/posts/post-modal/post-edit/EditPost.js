@@ -103,8 +103,8 @@ const EditPost = () => {
 
   // set editable fields of the post
   const editableFields = useCallback(() => {
-    if (post?.post.feelings) {
-      getFeeling(post?.post.feelings);
+    if (post?.feelings) {
+      getFeeling(post?.feelings);
     }
 
     if (post?.bgColor) {
@@ -149,42 +149,21 @@ const EditPost = () => {
       postData.profilePicture = profile?.profilePicture;
       if (selectedPostImage) {
         // update post with image
-        updatePostWithImage();
+        const result = await ImageUtils.readAsBase64(selectedPostImage);
+        await PostUtils.sendUpdatePostWithImageRequest(
+          result,
+          post?._id,
+          postData,
+          setApiResponse,
+          setLoading,
+          dispatch
+        );
       } else {
         // update post without image
-        updateUserPost();
+        await PostUtils.sendUpdatePostRequest(post?._id, postData, setApiResponse, setLoading, dispatch);
       }
     } catch (error) {
-      PostUtils.dispatchNotification(
-        error.response.data.message,
-        'error',
-        setApiResponse,
-        setLoading,
-        setDisable,
-        dispatch
-      );
-    }
-  };
-
-  const updateUserPost = async () => {
-    const response = await PostUtils.sendUpdatePostRequest(post?._id, postData, setApiResponse, setLoading, dispatch);
-    if (response && response?.data?.message) {
-      PostUtils.closePostModal(dispatch);
-    }
-  };
-
-  const updatePostWithImage = async (image) => {
-    const result = await ImageUtils.readAsBase64(image);
-    const response = await PostUtils.sendUpdatePostWithImageRequest(
-      result,
-      post?._id,
-      postData,
-      setApiResponse,
-      setLoading,
-      dispatch
-    );
-    if (response && response?.data?.message) {
-      PostUtils.closePostModal(dispatch);
+      PostUtils.dispatchNotification(error.response.data.message, 'error', setApiResponse, setLoading, dispatch);
     }
   };
 
