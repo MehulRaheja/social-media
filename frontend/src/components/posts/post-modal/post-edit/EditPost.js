@@ -1,18 +1,19 @@
 import PostWrapper from '@components/posts/modal-wrappers/post-wrapper/PostWrapper';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import '@components/posts/post-modal/post-edit/EditPost.scss';
 import ModalBoxContent from '@components/posts/post-modal/modal-box-content/ModalBoxContent';
 import { FaArrowLeft, FaTimes } from 'react-icons/fa';
-import { bgColors } from '@services/utils/static.data';
+import { bgColors, feelingsList } from '@services/utils/static.data';
 import ModalBoxSelection from '@components/posts/post-modal/modal-box-content/ModalBoxSelection';
 import Button from '@components/button/Button';
 import { PostUtils } from '@services/utils/post-utils.service';
-import { closeModal, toggleGifModal } from '@redux/reducers/modal/modal.reducer';
+import { addPostFeeling, closeModal, toggleGifModal } from '@redux/reducers/modal/modal.reducer';
 import Giphy from '@components/giphy/Giphy';
 import { ImageUtils } from '@services/utils/image-utils.service';
-import { postService } from '@services/api/post/post.service';
 import Spinner from '@components/spinner/Spinner';
+import { find } from 'lodash';
+import { Utils } from '@services/utils/utils.service';
 
 const EditPost = () => {
   const { gifModalIsOpen, feeling } = useSelector((state) => state.modal);
@@ -68,50 +69,90 @@ const EditPost = () => {
   };
 
   const clearImage = () => {
-    PostUtils.clearImage(postData, '', inputRef, dispatch, setSelectedPostImage, setPostImage, setDisable, setPostData);
+    PostUtils.clearImage(
+      postData,
+      post?.post,
+      inputRef,
+      dispatch,
+      setSelectedPostImage,
+      setPostImage,
+      setDisable,
+      setPostData
+    );
   };
 
-  const createPost = async () => {
+  // to setup post feeling
+  const getFeeling = useCallback(
+    (name) => {
+      const feeling = find(feelingsList, (data) => data.name === name);
+      dispatch(addPostFeeling({ feeling }));
+    },
+    [dispatch]
+  );
+
+  // to setup post text content, image etc
+  const postInputData = useCallback(() => {
+    setTimeout(() => {
+      if (imageInputRef?.current) {
+        postData.post = post?.post;
+        imageInputRef.current.textContent = post?.post;
+        setPostData(postData);
+      }
+    });
+  }, [post, postData]);
+
+  // set editable fields of the post
+  const editableFields = useCallback(() => {
+    if (post?.post.feelings) {
+      getFeeling(post?.post.feelings);
+    }
+
+    if (post?.bgColor) {
+      postData.bgColor = post?.bgColor;
+      setPostData(postData);
+      setTextAreaBackground(post?.bgColor);
+      setTimeout(() => {
+        if (inputRef?.current) {
+          postData.post = post?.post;
+          inputRef.current.textContent = post?.post;
+          setPostData(postData);
+        }
+      });
+    }
+
+    if (post?.gifUrl && !post?.imgId) {
+      postData.gifUrl = post?.gifUrl;
+      setPostImage(post?.gifUrl);
+      postInputData();
+    }
+
+    if (post?.imgId && !post?.gifUrl) {
+      postData.imgId = post?.imgId;
+      postData.imgVersion = post?.imgVersion;
+      const imageUrl = Utils.getImage(post?.imgId, post?.imgVersion);
+      setPostImage(imageUrl);
+      postInputData();
+    }
+  }, [post, postData, getFeeling, postInputData]);
+
+  const updatePost = async () => {
     setLoading(!loading);
     setDisable(!disable);
     try {
       if (Object.keys(feeling).length) {
         postData.feelings = feeling?.name;
       }
-      // postData.privacy = privacy || 'Public';
-      // postData.gifUrl = gifUrl;
+      if (postData.gifUrl || (postData.imgId && postData.imgVersion)) {
+        postData.bgColor = '#ffffff';
+      }
+      postData.privacy = post?.privacy || 'Public';
       postData.profilePicture = profile?.profilePicture;
       if (selectedPostImage) {
-        // convert image to base64 format
-        let result = '';
-        if (selectedPostImage) {
-          result = await ImageUtils.readAsBase64(selectedPostImage);
-        }
-
-        // if (selectedImage) {
-        //   result = await ImageUtils.readAsBase64(selectedImage);
-        // }
-        // create post with image
-        const response = await PostUtils.sendPostWithImageRequest(
-          result,
-          postData,
-          imageInputRef,
-          setApiResponse,
-          setLoading,
-          setDisable,
-          dispatch
-        );
-        if (response && response.data?.message) {
-          PostUtils.closePostModal(dispatch);
-        }
+        // update post with image
+        updatePostWithImage();
       } else {
-        // create post without image
-        const response = await postService.createPost(postData);
-        if (response) {
-          setApiResponse('success');
-          setLoading(false);
-          PostUtils.closePostModal(dispatch);
-        }
+        // update post without image
+        updateUserPost();
       }
     } catch (error) {
       PostUtils.dispatchNotification(
@@ -125,27 +166,61 @@ const EditPost = () => {
     }
   };
 
+  const updateUserPost = async () => {
+    const response = await PostUtils.sendUpdatePostRequest(post?._id, postData, setApiResponse, setLoading, dispatch);
+    if (response && response?.data?.message) {
+      PostUtils.closePostModal(dispatch);
+    }
+  };
+
+  const updatePostWithImage = async (image) => {
+    const result = await ImageUtils.readAsBase64(image);
+    const response = await PostUtils.sendUpdatePostWithImageRequest(
+      result,
+      post?._id,
+      postData,
+      setApiResponse,
+      setLoading,
+      dispatch
+    );
+    if (response && response?.data?.message) {
+      PostUtils.closePostModal(dispatch);
+    }
+  };
+
   useEffect(() => {
-    console.log(post);
     PostUtils.positionCursor('editable');
   }, [post]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (imageInputRef?.current?.textContent.length) {
+        counterRef.current.textContent = `${maxNumberOfCharacters - imageInputRef?.current.textContent.length}/100`;
+      } else if (inputRef?.current?.textContent.length) {
+        counterRef.current.textContent = `${maxNumberOfCharacters - inputRef?.current.textContent.length}/100`;
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (!loading && apiResponse === 'success') {
       dispatch(closeModal());
     }
-    setDisable(postData.post.length <= 0 && !postImage);
-  }, [loading, apiResponse, dispatch, postData.post.length, postImage]);
+    setDisable(post?.post.length <= 0 && !postImage);
+  }, [loading, apiResponse, dispatch, post, postImage]);
 
-  // useEffect(() => {
-  //   if (gifUrl) {
-  //     setPostImage(gifUrl);
-  //     PostUtils.postInputData(imageInputRef, postData, '', setPostData);
-  //   } else if (image) {
-  //     setPostImage(image);
-  //     PostUtils.postInputData(imageInputRef, postData, '', setPostData);
-  //   }
-  // }, [gifUrl, image, postData]);
+  useEffect(() => {
+    if (post?.gifUrl) {
+      postData.image = '';
+      setSelectedPostImage(null);
+      setPostImage(post?.gifUrl);
+      PostUtils.postInputData(imageInputRef, postData, post?.post, setPostData);
+    } else if (post?.image) {
+      setPostImage(post?.image);
+      PostUtils.postInputData(imageInputRef, postData, post?.post, setPostData);
+    }
+    editableFields();
+  }, [editableFields, post, postData]);
 
   return (
     <>
@@ -155,7 +230,7 @@ const EditPost = () => {
           <div
             className="modal-box"
             style={{
-              height: selectedPostImage || postData?.gifUrl || postData?.image ? '700px' : 'auto'
+              height: selectedPostImage || post?.gifUrl || post?.imgId ? '700px' : 'auto'
             }}
           >
             {loading && (
@@ -254,7 +329,7 @@ const EditPost = () => {
             <ModalBoxSelection setSelectedPostImage={setSelectedPostImage} />
 
             <div className="modal-box-button" data-testid="post-button">
-              <Button label="Create Post" className="post-button" disabled={disable} handleClick={createPost} />
+              <Button label="Update" className="post-button" disabled={disable} handleClick={updatePost} />
             </div>
           </div>
         )}

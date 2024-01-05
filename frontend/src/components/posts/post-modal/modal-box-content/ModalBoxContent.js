@@ -2,10 +2,10 @@ import Avatar from '@components/avatar/Avatar';
 import SelectDropdown from '@components/select-dropdown/SelectDropdown';
 import useDetectOutsideClick from '@hooks/useDetectOutsideClick';
 import { privacyList } from '@services/utils/static.data';
-import { find } from 'lodash';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { FaGlobe } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
+import { find } from 'lodash';
 
 const ModalBoxContent = () => {
   const { profile } = useSelector((state) => state.user);
@@ -14,10 +14,10 @@ const ModalBoxContent = () => {
   const privacyRef = useRef(null);
   const [selectedItem, setSelectedItem] = useState({
     topText: 'Public',
-    subText: 'Anyone on Socialiser',
+    subText: 'Anyone on Chatty',
     icon: <FaGlobe className="globe-icon globe" />
   });
-  const [togglePrivacy, setTogglePrivacy] = useDetectOutsideClick(privacyRef, false);
+  const [tooglePrivacy, setTogglePrivacy] = useDetectOutsideClick(privacyRef, false);
 
   const displayPostPrivacy = useCallback(() => {
     if (privacy) {
@@ -45,26 +45,26 @@ const ModalBoxContent = () => {
         <h5 className="inline-title-display" data-testid="box-username">
           {profile?.username}
         </h5>
-        {feeling?.name ? (
+        {feeling?.name && (
           <p className="inline-display" data-testid="box-feeling">
             is feeling <img className="feeling-icon" src={`${feeling?.image}`} alt="" /> <span>{feeling?.name}</span>
           </p>
-        ) : null}
+        )}
         <div
           data-testid="box-text-display"
           className="time-text-display"
-          onClick={() => setTogglePrivacy(!togglePrivacy)}
+          onClick={() => setTogglePrivacy(!tooglePrivacy)}
         >
+          {selectedItem.icon}{' '}
           <div className="selected-item-text" data-testid="box-item-text">
             {selectedItem.topText}
           </div>
           <div ref={privacyRef}>
-            <SelectDropdown isActive={togglePrivacy} items={privacyList} setSelectedItem={setSelectedItem} />
+            <SelectDropdown isActive={tooglePrivacy} items={privacyList} setSelectedItem={setSelectedItem} />
           </div>
         </div>
       </div>
     </div>
   );
 };
-
 export default ModalBoxContent;
