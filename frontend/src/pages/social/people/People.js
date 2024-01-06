@@ -1,21 +1,68 @@
 import Avatar from '@components/avatar/Avatar';
 import CardElementButtons from '@components/card-element/CardElementButtons';
 import CardElementStats from '@components/card-element/CardElementStats';
+import useEffectOnce from '@hooks/useEffectOnce';
 import useInfiniteScroll from '@hooks/useInfiniteScroll';
 import '@pages/social/people/People.scss';
+import { userService } from '@services/api/user/user.service';
+import { ProfileUtils } from '@services/utils/profile-utils.service';
 import { Utils } from '@services/utils/utils.service';
-import { useRef, useState } from 'react';
+import { uniqBy } from 'lodash';
+import { useCallback, useRef, useState } from 'react';
 import { FaCircle } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const People = () => {
-  const [users] = useState([]);
+  const [users, setUsers] = useState([]);
   const [onlineUsers] = useState([]);
-  const [loading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  // const [currentPage, setCurrentPage] = useState(0);
+  const pageCount = useRef(1);
+  const [totalUsersCount, setTotalUsersCount] = useState(0);
   const bodyRef = useRef(null);
   const bottomLineRef = useRef(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   useInfiniteScroll(bodyRef, bottomLineRef, fetchData);
 
-  function fetchData() {}
+  const PAGE_SIZE = 12;
+
+  function fetchData() {
+    let pageNum = pageCount.current;
+    if (pageCount.current <= Math.round(totalUsersCount / PAGE_SIZE)) {
+      pageNum += 1;
+      // setCurrentPage(pageNum);
+      pageCount.current = pageNum;
+      getAllUsers();
+    }
+  }
+
+  const getAllUsers = useCallback(async () => {
+    try {
+      const response = await userService.getAllUsers(pageCount.current);
+      if (response.data.users.length) {
+        setUsers((data) => {
+          const result = [...data, ...response.data.users];
+          const allUsers = uniqBy(result, '_id');
+          return allUsers;
+        });
+      }
+      setTotalUsersCount(response.data.totalUsers);
+      // update followers list here
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      Utils.dispatchNotification(error.response.data.message, 'error', dispatch);
+    }
+  }, [pageCount, dispatch]);
+
+  const followUser = async (user) => {};
+  const unFollowUser = async (user) => {};
+
+  useEffectOnce(() => {
+    getAllUsers();
+  });
 
   return (
     <div className="card-container" ref={bodyRef}>
@@ -51,9 +98,9 @@ const People = () => {
                 isChecked={Utils.checkIfUserIsFollowed([], data?._id)}
                 btnTextOne="Follow"
                 btnTextTwo="Unfollow"
-                onClickBtnOne={() => {}}
-                onClickBtnTwo={() => {}}
-                onNavigateToProfile={() => {}}
+                onClickBtnOne={() => followUser(data)}
+                onClickBtnTwo={() => unFollowUser(data)}
+                onNavigateToProfile={() => ProfileUtils.navigateToProfile(data, navigate)}
               />
             </div>
           ))}

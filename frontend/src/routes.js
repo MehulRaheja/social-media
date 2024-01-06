@@ -1,3 +1,4 @@
+import CardSkeleton from '@components/card-element/CardSkeleton';
 import ProtectedRoute from '@pages/ProtectedRoute';
 import { AuthTabs, ForgotPassword, ResetPassword } from '@pages/auth';
 import Error from '@pages/error/Error';
@@ -59,7 +60,7 @@ export const AppRouter = () => {
         {
           path: 'people',
           element: (
-            <Suspense>
+            <Suspense fallback={<CardSkeleton />}>
               <People />
             </Suspense>
           )
