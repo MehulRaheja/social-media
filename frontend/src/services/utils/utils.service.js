@@ -1,4 +1,4 @@
-import { floor, random, some } from 'lodash';
+import { findIndex, floor, random, some } from 'lodash';
 import { avatarColors } from '@services/utils/static.data';
 import { addUser, clearUser } from '@redux/reducers/user/user.reducer';
 import { addNotification, clearNotification } from '@redux/reducers/notifications/notification.reducer';
@@ -94,7 +94,7 @@ export class Utils {
   }
 
   static checkIfUserIsFollowed(userFollowers, postCreatorId, userId) {
-    return some(userFollowers, (user) => user === postCreatorId || postCreatorId === userId);
+    return some(userFollowers, (user) => user._id === postCreatorId || postCreatorId === userId);
   }
 
   static checkIfUserIsOnline(username, onlineUsers) {
@@ -130,5 +130,11 @@ export class Utils {
 
   static getImage(imageId, imageVersion) {
     return imageId && imageVersion ? this.appImageUrl(imageVersion, imageId) : '';
+  }
+
+  static removeUserFromList(list, userId) {
+    const index = findIndex(list, (id) => id === userId);
+    list.splice(index, 1);
+    return list;
   }
 }
