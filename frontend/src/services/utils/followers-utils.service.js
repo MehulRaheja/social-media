@@ -1,4 +1,3 @@
-import { addToSuggestions } from '@redux/reducers/suggestions/suggestions.reducer';
 import { addUser } from '@redux/reducers/user/user.reducer';
 import { followerService } from '@services/api/followers/follower-service';
 import { socketService } from '@services/socket/socket.service';
@@ -42,17 +41,6 @@ export class FollowersUtils {
         const updatedFollowers = filter(followers, (follower) => follower._id !== data?._id);
         setFollowers(updatedFollowers);
         FollowersUtils.updateSingleUser(users, userData, data, setUsers);
-      }
-    });
-  }
-
-  static socketIOFollowUsersSuggestions(users, dispatch) {
-    socketService?.socket?.on('add follower', (data) => {
-      users = cloneDeep(users);
-      const userIndex = findIndex(users, (user) => user._id === data?._id);
-      if (userIndex) {
-        users.splice(userIndex, 1);
-        dispatch(addToSuggestions({ users, isLoading: false }));
       }
     });
   }
