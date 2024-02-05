@@ -105,6 +105,8 @@ const Followers = () => {
           You have no followers
         </div>
       ) : null}
+
+      <div style={{ marginBottom: '80px', height: '50px' }}></div>
     </div>
   );
 };
