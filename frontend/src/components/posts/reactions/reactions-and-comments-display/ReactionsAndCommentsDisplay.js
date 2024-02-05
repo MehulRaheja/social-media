@@ -62,7 +62,7 @@ const ReactionsAndCommentsDisplay = ({ post }) => {
           <div className="likes-block-icons reactions-icon-display">
             {reactions.length
               ? reactions.map((reaction) => (
-                  <div className="tooltip-container" key={Utils.generateString(10)}>
+                  <div className="tooltip-container" key={reaction?.type}>
                     <img
                       data-testid="reaction-img"
                       className="reaction-img"
@@ -72,7 +72,7 @@ const ReactionsAndCommentsDisplay = ({ post }) => {
                     />
                     <div className="tooltip-container-text tooltip-container-bottom" data-testid="reaction-tooltip">
                       <p className="title">
-                        <img className="title-img" src={`${reactionsMap[reaction.type]}`} alt="" />
+                        <img className="title-img" src={`${reactionsMap[reaction?.type]}`} alt="" />
                         {reaction.type.toUpperCase()}
                       </p>
                       <div className="likes-block-icons-list">

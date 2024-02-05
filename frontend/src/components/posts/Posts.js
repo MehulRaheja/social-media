@@ -23,12 +23,12 @@ const Posts = ({ allPosts, userFollowing, postsLoading }) => {
     <div className="posts-container" data-testid="posts">
       {!loading && posts.length
         ? posts.map((post) => (
-            <div key={Utils.generateString(10)} data-testid="posts-item">
+            <div key={post?._id} data-testid="posts-item">
               {(!Utils.checkIfUserIsFollowed(profile?.blockedBy, post?.userId) || post?.userId === profile?._id) && (
                 <>
                   {PostUtils.checkPrivacy(post, profile, following) && (
                     <>
-                      <Post post={post} showIcons={true} />
+                      <Post post={post} showIcons={false} />
                     </>
                   )}
                 </>
