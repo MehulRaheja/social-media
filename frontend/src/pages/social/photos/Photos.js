@@ -1,4 +1,5 @@
 import GalleryImage from '@components/gallery-image/GalleryImage';
+import ImageModal from '@components/image-modal/ImageModal';
 import useEffectOnce from '@hooks/useEffectOnce';
 import '@pages/social/photos/Photos.scss';
 import { followerService } from '@services/api/followers/follower-service';
@@ -12,7 +13,13 @@ const Photos = () => {
   const { profile } = useSelector((state) => state.user);
   const [posts, setPosts] = useState([]);
   const [following, setFollowing] = useState([]);
+  const [imageUrl, setImageUrl] = useState('');
+  const [showImageModal, setShowImageModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [rightImageIndex, setRightImageIndex] = useState();
+  const [lefttImageIndex, setLeftImageIndex] = useState();
+  const [lastItemRight, setLastItemRight] = useState(false);
+  const [lastItemLeft, setLastItemLeft] = useState(false);
   const dispatch = useDispatch();
 
   const getPostsWithImages = async () => {
@@ -36,14 +43,43 @@ const Photos = () => {
   };
 
   const postImageUrl = (post) => {
-    const imageUrl = Utils.getImage(post?.imgId, post?.imageVersion);
-    return post?.gifUrl ? post.gifUrl : imageUrl;
+    const imgUrl = Utils.getImage(post?.imgId, post?.imageVersion);
+    return post?.gifUrl ? post.gifUrl : imgUrl;
   };
 
   const emptyPost = (post) => {
     return (
       Utils.checkIfUserIsBlocked(profile?.blockedBy, post?.userId) || PostUtils.checkPrivacy(post, profile, following)
     );
+  };
+
+  const displayImage = (post) => {
+    const imgUrl = post?.gifUrl ? post.gifUrl : Utils.getImage(post?.imgId, post?.imageVersion);
+    setImageUrl(imgUrl);
+  };
+
+  const onClickRight = () => {
+    setLastItemLeft(false);
+    setRightImageIndex((index) => index + 1);
+    const lastImage = posts[posts.length - 1];
+    const post = posts[rightImageIndex];
+    displayImage(post);
+    setLeftImageIndex(rightImageIndex);
+    if (posts[rightImageIndex] === lastImage) {
+      setLastItemRight(true);
+    }
+  };
+
+  const onClickLeft = () => {
+    setLastItemRight(false);
+    setLeftImageIndex((index) => index - 1);
+    const firstImage = posts[0];
+    const post = posts[lefttImageIndex - 1];
+    displayImage(post);
+    setLeftImageIndex(lefttImageIndex);
+    if (post === firstImage) {
+      setLastItemLeft(true);
+    }
   };
 
   useEffectOnce(() => {
@@ -54,6 +90,24 @@ const Photos = () => {
   return (
     <>
       <div className="photos-container">
+        {showImageModal && (
+          <ImageModal
+            image={`${imageUrl}`}
+            showArrow={true}
+            onClickRight={() => onClickRight()}
+            onClickLeft={() => onClickLeft()}
+            lastItemLeft={lastItemLeft}
+            lastItemRight={lastItemRight}
+            onCancel={() => {
+              setRightImageIndex(0);
+              setLeftImageIndex(0);
+              setLastItemRight(false);
+              setLastItemLeft(false);
+              setShowImageModal(!showImageModal);
+              setImageUrl('');
+            }}
+          />
+        )}
         <div className="photos">Photos</div>
         {posts.length && (
           <div className="gallery-images">
@@ -72,7 +126,16 @@ const Photos = () => {
                           showCaption={true}
                           showDelete={false}
                           imgSrc={`${postImageUrl(post)}`}
-                          onClick={() => {}}
+                          onClick={() => {
+                            setRightImageIndex(index + 1);
+                            setLeftImageIndex(index);
+
+                            setLastItemLeft(index === 0);
+                            setLastItemRight(index + 1 === posts.length);
+
+                            setImageUrl(postImageUrl(post));
+                            setShowImageModal(!showImageModal);
+                          }}
                         />
                       </>
                     )}
