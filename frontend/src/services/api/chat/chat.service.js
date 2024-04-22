@@ -6,6 +6,11 @@ class ChatService {
     return response;
   }
 
+  async getChatMessages(receiverId) {
+    const response = await axios.get(`/chat/message/user/${receiverId}`);
+    return response;
+  }
+
   async addChatUsers(body) {
     const response = await axios.post('/chat/message/add-chat-users', body);
     return response;
@@ -19,6 +24,11 @@ class ChatService {
 
   async markMessagesAsRead(senderId, receiverId) {
     const response = await axios.put(`/chat/message/mark-as-read`, { senderId, receiverId });
+    return response;
+  }
+
+  async saveChatMessage(body) {
+    const response = await axios.put('/chat/message', body);
     return response;
   }
 }
