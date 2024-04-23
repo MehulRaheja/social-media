@@ -28,7 +28,17 @@ class ChatService {
   }
 
   async saveChatMessage(body) {
-    const response = await axios.put('/chat/message', body);
+    const response = await axios.post('/chat/message', body);
+    return response;
+  }
+
+  async updateMessageReaction(body) {
+    const response = await axios.put('/chat/message/reaction', body);
+    return response;
+  }
+
+  async markMessageAsDelete(messageId, senderId, receiverId, type) {
+    const response = await axios.delete(`/chat/message/mark-as-deleted/${messageId}/${senderId}/${receiverId}/${type}`);
     return response;
   }
 }

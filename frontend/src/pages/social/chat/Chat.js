@@ -20,7 +20,7 @@ const Chat = () => {
           <ChatList />
         </div>
         <div className="private-chat-wrapper-content-conversation">
-          {selectedChatUser || chatList.length ? <ChatWindow /> : null}
+          {(selectedChatUser || chatList.length > 0) && <ChatWindow />}
           {!selectedChatUser && !chatList.length ? (
             <div className="no-chat" data-testid="no-chat">
               Select or Search for users to chat with
