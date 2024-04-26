@@ -190,7 +190,7 @@ const ChatList = () => {
               setSearch(event.target.value);
             }}
           />
-          {search && (
+          {search ? (
             <FaTimes
               className="times"
               onClick={() => {
@@ -199,11 +199,11 @@ const ChatList = () => {
                 setSearchResult([]);
               }}
             />
-          )}
+          ) : null}
         </div>
 
         <div className="conversation-container-body">
-          {!search && (
+          {!search ? (
             <div className="conversation">
               {chatMessageList.map((data) => (
                 <div
@@ -241,9 +241,9 @@ const ChatList = () => {
                       <FaTimes />
                     </div>
                   )}
-                  {data?.body && !data?.deleteForMe && !data.deleteForEveryone && (
+                  {data?.body && !data?.deleteForMe && !data.deleteForEveryone ? (
                     <ChatListBody data={data} profile={profile} />
-                  )}
+                  ) : null}
                   {data?.deleteForMe && data?.deleteForEveryone && (
                     <div className="conversation-message">
                       <span className="message-deleted">message deleted</span>
@@ -260,7 +260,7 @@ const ChatList = () => {
                 </div>
               ))}
             </div>
-          )}
+          ) : null}
 
           {/* <!-- search component --> */}
           <SearchList

@@ -95,7 +95,7 @@ const RightMessageDisplay = ({
         )}
       </div>
       <div className="message-content-bottom">
-        {chat?.reaction && chat?.reaction.length > 0 && !chat.deleteForEveryone && (
+        {chat?.reaction?.length > 0 && !chat.deleteForEveryone && (
           <div className="message-reaction">
             {chat?.reaction.map((data, index) => (
               <img
