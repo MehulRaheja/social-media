@@ -219,9 +219,9 @@ const ChatList = () => {
                 >
                   <div className="avatar">
                     <Avatar
-                      name={data.receiverUsername === profile?.username ? profile?.username : data?.senderUsername}
+                      name={data.receiverUsername !== profile?.username ? data.receiverUsername : data?.senderUsername}
                       bgColor={
-                        data.receiverUsername === profile?.username ? data.receiverAvatarColor : data?.senderAvatarColor
+                        data.receiverUsername !== profile?.username ? data.receiverAvatarColor : data?.senderAvatarColor
                       }
                       textColor="#ffffff"
                       size={40}

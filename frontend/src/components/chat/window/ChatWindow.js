@@ -159,6 +159,7 @@ const ChatWindow = () => {
               />
             </div>
             <div className="chat-window-input">
+              <p>what the hell is this</p>
               <MessageInput setChatMessage={sendChatMessage} />
             </div>
           </div>
