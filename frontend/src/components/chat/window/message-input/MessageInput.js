@@ -79,7 +79,7 @@ const MessageInput = ({ setChatMessage }) => {
       {showEmojiContainer && (
         <EmojiPickerComponent
           onEmojiClick={(event, eventObject) => {
-            setMessage((text) => (text += ` ${eventObject.emoji}`));
+            setMessage((text) => (text += ` ${event.emoji}`));
           }}
           pickerStyle={{ width: '352px', height: '447px' }}
         />
