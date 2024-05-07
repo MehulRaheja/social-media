@@ -8,7 +8,7 @@ import { Utils } from '@services/utils/utils.service';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { followerService } from '@services/api/followers/follower-service';
+import { followerService } from '@services/api/followers/follower.service';
 import { socketService } from '@services/socket/socket.service';
 import { FollowersUtils } from '@services/utils/followers-utils.service';
 

@@ -14,7 +14,7 @@ import useInfiniteScroll from '@hooks/useInfiniteScroll';
 import { PostUtils } from '@services/utils/post-utils.service';
 import useLocalStorage from '@hooks/useLocalStorage';
 import { addReactions } from '@redux/reducers/post/user-post-reaction.reducer';
-import { followerService } from '@services/api/followers/follower-service';
+import { followerService } from '@services/api/followers/follower.service';
 
 const Streams = () => {
   const { allPosts } = useSelector((state) => state);
