@@ -2,7 +2,7 @@ import GalleryImage from '@components/gallery-image/GalleryImage';
 import ImageModal from '@components/image-modal/ImageModal';
 import useEffectOnce from '@hooks/useEffectOnce';
 import '@pages/social/photos/Photos.scss';
-import { followerService } from '@services/api/followers/follower-service';
+import { followerService } from '@services/api/followers/follower.service';
 import { postService } from '@services/api/post/post.service';
 import { PostUtils } from '@services/utils/post-utils.service';
 import { Utils } from '@services/utils/utils.service';
