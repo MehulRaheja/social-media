@@ -56,7 +56,7 @@ const PostForm = () => {
   };
 
   const handleFileChange = (event) => {
-    ImageUtils.addFileToRedux(event, '', setSelectedPostImage, dispatch);
+    ImageUtils.addFileToRedux(event, '', setSelectedPostImage, dispatch, 'image');
   };
 
   const handleVideoFileChange = (event) => {
@@ -123,10 +123,9 @@ const PostForm = () => {
           </div>
         </div>
       </div>
-      {isOpen && type === 'add' && <AddPost selectedImage={selectedPostImage} />}
+      {isOpen && type === 'add' && <AddPost selectedImage={selectedPostImage} selectedPostVideo={selectedPostVideo} />}
       {isOpen && type === 'edit' && <EditPost />}
     </>
   );
 };
-
 export default PostForm;
