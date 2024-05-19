@@ -132,6 +132,12 @@ export class Utils {
     return imageId && imageVersion ? this.appImageUrl(imageVersion, imageId) : '';
   }
 
+  static getVideo(videoId, videoVersion) {
+    return videoId && videoVersion
+      ? `https://res.cloudinary.com/dlft3yfad/video/upload/v${videoVersion}/${videoId}`
+      : '';
+  }
+
   static removeUserFromList(list, userId) {
     const index = findIndex(list, (id) => id === userId);
     list.splice(index, 1);
@@ -145,7 +151,7 @@ export class Utils {
   static renameFile(element) {
     const fileName = element.name.split('.').slice(0, -1).join('.');
     const blob = element.slice(0, element.size, '/image/png');
-    const newFile = new File([blob], `${fileName}.png`, { type: 'image/png' });
+    const newFile = new File([blob], `${fileName}.png`, { type: '/image/png' });
     return newFile;
   }
 }

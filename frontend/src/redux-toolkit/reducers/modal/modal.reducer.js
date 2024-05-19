@@ -8,6 +8,7 @@ const initialState = {
   data: null,
   feelingsIsOpen: false,
   openFileDialog: false,
+  openVideoDialog: false,
   gifModalIsOpen: false,
   reactionsModalIsOpen: false,
   commentsModalIsOpen: false,
@@ -32,6 +33,7 @@ const modalSlice = createSlice({
       state.data = null;
       state.feelingsIsOpen = false;
       state.openFileDialog = false;
+      state.openVideoDialog = false;
       state.gifModalIsOpen = false;
       state.reactionsModalIsOpen = false;
       state.commentsModalIsOpen = false;

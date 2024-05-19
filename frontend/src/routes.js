@@ -6,6 +6,7 @@ import NotificationSkeleton from '@pages/social/notifications/NotificationSkelet
 import PhotoSkeleton from '@pages/social/photos/PhotoSkeleton';
 import ProfileSkeleton from '@pages/social/profile/ProfileSkeleton';
 import StreamsSkeleton from '@pages/social/streams/StreamsSkeleton';
+import VideoSkeleton from '@pages/social/videos/VideoSkeleton';
 import { Suspense, lazy } from 'react';
 import { useRoutes } from 'react-router-dom';
 
@@ -16,6 +17,7 @@ const Following = lazy(() => import('@pages/social/following/Following'));
 const Notifications = lazy(() => import('@pages/social/notifications/Notification'));
 const People = lazy(() => import('@pages/social/people/People'));
 const Photos = lazy(() => import('@pages/social/photos/Photos'));
+const Videos = lazy(() => import('@pages/social/videos/Videos'));
 const Profile = lazy(() => import('@pages/social/profile/Profile'));
 const Streams = lazy(() => import('@pages/social/streams/Streams'));
 
@@ -88,6 +90,14 @@ export const AppRouter = () => {
           element: (
             <Suspense fallback={<PhotoSkeleton />}>
               <Photos />
+            </Suspense>
+          )
+        },
+        {
+          path: 'videos',
+          element: (
+            <Suspense fallback={<VideoSkeleton />}>
+              <Videos />
             </Suspense>
           )
         },
