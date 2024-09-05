@@ -41,10 +41,10 @@ const Notification = () => {
   };
 
   const deleteNotification = async (event, messageId) => {
-    event.stopPropagation(); // it will stop the propagation on the tree, only affect the specific icon not the entire div
+    event.stopPropagation();
     try {
       const response = await notificationService.deleteNotification(messageId);
-      Utils.dispatchNotification(response.data.message, 'success', dispatch); // if deletion is successful then we will show success notification
+      Utils.dispatchNotification(response.data.message, 'success', dispatch);
     } catch (error) {
       Utils.dispatchNotification(error.response.data.message, 'error', dispatch);
     }

@@ -68,8 +68,7 @@ const EditPost = () => {
   const onKeyDown = (event) => {
     const currentTextLength = event.target.textContent.length;
     if (currentTextLength === maxNumberOfCharacters && event.keyCode !== 8) {
-      // keyCode === 8 is for backspace
-      event.preventDefault(); // prevent user from typing any input
+      event.preventDefault();
     }
   };
 
@@ -79,7 +78,6 @@ const EditPost = () => {
     PostUtils.clearImage(postData, post?.post, inputRef, dispatch, setSelectedPostImage, setPostImage, setPostData);
   };
 
-  // to setup post feeling
   const getFeeling = useCallback(
     (name) => {
       const feeling = find(feelingsList, (data) => data.name === name);
@@ -88,7 +86,6 @@ const EditPost = () => {
     [dispatch]
   );
 
-  // to setup post text content, image etc
   const postInputData = useCallback(() => {
     setTimeout(() => {
       if (imageInputRef?.current) {
@@ -99,7 +96,6 @@ const EditPost = () => {
     });
   }, [post, postData]);
 
-  // set editable fields of the post
   const editableFields = useCallback(() => {
     if (post?.feelings) {
       getFeeling(post?.feelings);
@@ -169,7 +165,6 @@ const EditPost = () => {
       postData.privacy = post?.privacy || 'Public';
       postData.profilePicture = profile?.profilePicture;
       if (selectedPostImage || selectedVideo) {
-        // update post with image
         let result = '';
         if (selectedPostImage) {
           result = await ImageUtils.readAsBase64(selectedPostImage);
@@ -192,7 +187,6 @@ const EditPost = () => {
         postData.videoVersion = '';
         await PostUtils.sendUpdatePostWithFileRequest(type, post?._id, postData, setApiResponse, setLoading, dispatch);
       } else {
-        // update post without image
         setHasVideo(false);
         await PostUtils.sendUpdatePostRequest(post?._id, postData, setApiResponse, setLoading, dispatch);
       }

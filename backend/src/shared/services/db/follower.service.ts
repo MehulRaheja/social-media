@@ -43,8 +43,8 @@ class FollowerService {
 
     const response: [mongoose.mongo.BulkWriteResult, IUserDocument | null] = await Promise.all([users, userCache.getUserFromCache(followeeId)]);
 
-    if(response[1]?.notifications.follows && userId !== followeeId) { // userId !== followeeId is to check that user doesn't receive any notification from its own actions
-      const notificationModel: INotificationDocument = new NotificationModel(); // because we want to use our own defined method, we need to initiate the notification model class like this
+    if(response[1]?.notifications.follows && userId !== followeeId) {
+      const notificationModel: INotificationDocument = new NotificationModel();
       const notifications = await notificationModel.insertNotification({
         userFrom: userId,
         userTo: followeeId,
@@ -61,7 +61,6 @@ class FollowerService {
         reaction: ''
       });
       socketIONotificationObject.emit('insert notification', notifications, { userTo: followeeId });
-      // send to email queue
       const templateParams: INotificationTemplate = {
         username: response[1].username!,
         message: `${username} is now following you.`,

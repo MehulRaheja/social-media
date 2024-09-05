@@ -13,8 +13,6 @@ import { IFollowerJobData } from '@follower/interfaces/follower.interface';
 import { INotificationJobData } from '@notification/interfaces/notification.interface';
 import { IFileImageJobData } from '@image/interfaces/image.interface';
 import { IChatJobData, IMessageData } from '@chat/interfaces/chat.interface';
-// import { BaseAdapter } from '@bull-board/api/dist/src/queueAdapters/base';
-// import BullMQ from 'bullmq';
 
 type IBaseJobData = IAuthJob
   | IEmailJob
@@ -38,11 +36,10 @@ export abstract class BaseQueue {
   constructor(queueName: string) {
     this.queue = new Queue(queueName, `${config.REDIS_CLIENT}`);
     bullAdapters.push(new BullAdapter(this.queue));
-    bullAdapters = [...new Set(bullAdapters)]; // to remove duplicate queues
+    bullAdapters = [...new Set(bullAdapters)];
     serverAdapter = new ExpressAdapter();
     serverAdapter.setBasePath('/queues');
 
-    // creating a bull board
     createBullBoard({
       queues: bullAdapters,
       serverAdapter
@@ -54,26 +51,19 @@ export abstract class BaseQueue {
       job.remove();
     });
 
-    // when job completes its process successfully, we will get this message in console
     this.queue.on('global:completed', (jobId: string) => {
       this.log.info(`Job ${jobId} completed`);
     });
 
-    // when job is stalled, we will get this message in console
     this.queue.on('global:stalled', (jobId: string) => {
       this.log.info(`Job ${jobId} is stalled`);
     });
   }
 
-  // this method will add jobs to the queue
   protected addJob(name: string, data: IBaseJobData): void {
-    // attempts: how many times we want to attempt if a job fails and
-    // backoff(delay): how many seconds we wait before second attempt to add job
     this.queue.add(name, data, { attempts: 3, backoff: { type: 'fixed', delay: 5000 } });
   }
 
-  // method to process jobs inside the queue
-  // concurrency: how many jobs we want to process at a time
   protected processJob(name: string, concurrency: number, callback: Queue.ProcessCallbackFunction<void>): void {
     this.queue.process(name, concurrency, callback);
   }

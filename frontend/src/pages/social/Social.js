@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom'; // all the components passed to the outlet will be rendered on their respective route
+import { Outlet } from 'react-router-dom';
 
 import '@pages/social/Social.scss';
 import Header from '@components/header/Header';

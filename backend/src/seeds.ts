@@ -35,22 +35,21 @@ function avatarColor(): string {
     '#1de9b6',
     '#d84315'
   ];
-  return colors[floor(random(0.9) * colors.length)]; // selecting a random color from the above array, random func. has max value of 0.9
+  return colors[floor(random(0.9) * colors.length)];
 }
 
 function generateAvatar(text: string, backgroundColor: string, foregroundColor = 'white') {
-  const canvas = createCanvas(200, 200); // width and height of canvas
-  const context = canvas.getContext('2d'); // it will be of 2d style
+  const canvas = createCanvas(200, 200);
+  const context = canvas.getContext('2d');
 
   context.fillStyle = backgroundColor;
-  context.fillRect(0, 0, canvas.width, canvas.height); // 0, 0 is the position in x and y direction
+  context.fillRect(0, 0, canvas.width, canvas.height);
 
-  // below are the style properties of the canvas(avatar)
   context.font = 'normal 80px sans-serif';
   context.fillStyle = foregroundColor;
   context.textAlign = 'center';
   context.textBaseline = 'middle';
-  context.fillText(text, canvas.width/2, canvas.height/2); // canvas.width/2, canvas.height/2 is the x and y position of the text inside avatar
+  context.fillText(text, canvas.width/2, canvas.height/2);
 
   return canvas.toDataURL('image/png');
 }
@@ -59,11 +58,8 @@ async function seedUserData(count: number): Promise<void> {
   let i = 0;
   try {
     for(i = 0; i < count; i++) {
-      // const username: string = faker.unique(faker.word.adjective, [8]); // faker.unique function is deprecated
-      // const username: string = faker.internet.displayName();
-      let username: string = faker.person.firstName(); // creating a fake unique username
+      let username: string = faker.person.firstName();
       if(username.length < 4) username = faker.person.firstName();
-      // const username: string = faker.internet.userName(); // creating a fake unique username
       const color = avatarColor();
       const avatar = generateAvatar(username.charAt(0).toUpperCase(), color);
 

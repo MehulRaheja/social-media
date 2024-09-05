@@ -31,9 +31,6 @@ export class SignUp {
     const authObjectId: ObjectId = new ObjectId();
     const userObjectId: ObjectId = new ObjectId();
     const uId = `${Helpers.generateRandomIntegers(12)}`;
-    // the reason we are using SignUp.prototype.signupData and not this.signupData is because
-    // of how we invoke the create method in the routes method.
-    // the scope of the this object is not kept when the method is invoked
     const authData: IAuthDocument = SignUp.prototype.signupData({
       _id: authObjectId,
       uId,
@@ -49,13 +46,12 @@ export class SignUp {
 
     // Add to redis cache
     const userDataForCache: IUserDocument = SignUp.prototype.userData(authData, userObjectId);
-    userDataForCache.profilePicture = `https://res.cloudinary.com/dlft3yfad/image/upload/v${result.version}/${userObjectId}`; //cloudinary use public_id but we are generating public_id by ourselves and i.e. userObjectId
+    userDataForCache.profilePicture = `https://res.cloudinary.com/dlft3yfad/image/upload/v${result.version}/${userObjectId}`;
     await userCache.saveUserToCache(`${userObjectId}`, uId, userDataForCache);
 
     // Add to database
-    // const userResult = omit(userDataForCache, 'uId', 'username', 'email', 'avatarColor', 'password'); //omiting properties which are not going to be saved in the user collection
-    authQueue.addAuthUserJob('addAuthUserToDB', { value: authData }); // adding a job to the auth queue
-    userQueue.addUserJob('addUserToDB', { value: userDataForCache }); // adding a job to the user queue
+    authQueue.addAuthUserJob('addAuthUserToDB', { value: authData });
+    userQueue.addUserJob('addUserToDB', { value: userDataForCache });
 
     const userJwt: string = SignUp.prototype.signToken(authData, userObjectId);
     req.session = { jwt: userJwt };
@@ -87,8 +83,6 @@ export class SignUp {
       avatarColor,
       createdAt: new Date()
     } as IAuthDocument;
-    // } as unknown as IAuthDocument;
-    // we need to cast it into unknown type first because operation may fail
   }
 
   private userData(data: IAuthDocument, userObjectId: ObjectId): IUserDocument {

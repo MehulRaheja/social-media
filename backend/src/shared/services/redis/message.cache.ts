@@ -20,12 +20,12 @@ export class MessageCache extends BaseCache {
         await this.client.connect();
       }
       const userChatList = await this.client.LRANGE(`chatList:${senderId}`, 0, -1);
-      if(userChatList.length === 0){ // if user's chat doesn't exist in the chat list
-        await this.client.RPUSH(`chatList:${senderId}`, JSON.stringify({ receiverId, conversationId })); // add data to chat list to the right, otherwise we have to sort data when we retrieve chat list
+      if(userChatList.length === 0){
+        await this.client.RPUSH(`chatList:${senderId}`, JSON.stringify({ receiverId, conversationId }));
       } else {
         const receiverIndex: number = findIndex(userChatList, (listItem: string) => listItem.includes(receiverId));
-        if(receiverIndex < 0) { // if user has no chat with the receiver or user is sending message for the first time to that receiver
-          await this.client.RPUSH(`chatList:${senderId}`, JSON.stringify({ receiverId, conversationId })); // add data to chat list to the right, otherwise we have to sort data when we retrieve chat list
+        if(receiverIndex < 0) {
+          await this.client.RPUSH(`chatList:${senderId}`, JSON.stringify({ receiverId, conversationId }));
         }
       }
     } catch (error) {
@@ -39,7 +39,7 @@ export class MessageCache extends BaseCache {
       if(!this.client.isOpen){
         await this.client.connect();
       }
-      await this.client.RPUSH(`messages:${conversationId}`, JSON.stringify(value)); // add data to messages to the right, otherwise we have to sort data when we retrieve chat list
+      await this.client.RPUSH(`messages:${conversationId}`, JSON.stringify(value));
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again');
@@ -97,7 +97,7 @@ export class MessageCache extends BaseCache {
       const conversationChatList: IMessageData[] = [];
       for(const item of userChatList) {
         const chatItem: IChatList = Helpers.parseJson(item) as IChatList;
-        const lastMessage: string = await this.client.LINDEX(`messages:${chatItem.conversationId}`, -1) as string; // getting last message to show in chat list
+        const lastMessage: string = await this.client.LINDEX(`messages:${chatItem.conversationId}`, -1) as string;
         conversationChatList.push(Helpers.parseJson(lastMessage));
       }
       return conversationChatList;
@@ -115,7 +115,7 @@ export class MessageCache extends BaseCache {
       const userChatList: string[] = await this.client.LRANGE(`chatList:${senderId}`, 0, -1);
       const receiver: string = find(userChatList, (listItem: string) => listItem.includes(receiverId)) as string;
       const parsedReceiver: IChatList = Helpers.parseJson(receiver) as IChatList;
-      if(parsedReceiver){ // above 3 lines will not be required if we pass conversation id as a parameter to the function
+      if(parsedReceiver){
         const userMessages: string[] = await this.client.LRANGE(`messages:${parsedReceiver.conversationId}`, 0, -1);
         const chatMessages: IMessageData[] = [];
         for(const item of userMessages) {
@@ -147,7 +147,7 @@ export class MessageCache extends BaseCache {
       }
       await this.client.LSET(`messages:${receiver.conversationId}`, index, JSON.stringify(chatItem));
 
-      const lastMessage: string = await this.client.LINDEX(`messages:${receiver.conversationId}`, index) as string; // fetching last updated message
+      const lastMessage: string = await this.client.LINDEX(`messages:${receiver.conversationId}`, index) as string;
       return Helpers.parseJson(lastMessage) as IMessageData;
     } catch (error) {
       log.error(error);
@@ -167,11 +167,11 @@ export class MessageCache extends BaseCache {
       const unreadMessages: string[] = filter(messages, (listItem: string) => !Helpers.parseJson(listItem).isRead);
       for(const item of unreadMessages){
         const chatItem = Helpers.parseJson(item) as IMessageData;
-        const index = findIndex(messages, (listItem: string) => listItem.includes(`${chatItem._id}`)); // converted to string because lodash doesn't know the type ObjectId
+        const index = findIndex(messages, (listItem: string) => listItem.includes(`${chatItem._id}`));
         chatItem.isRead = true;
         await this.client.LSET(`messages:${chatItem.conversationId}`, index, JSON.stringify(chatItem));
       }
-      const lastMessage: string = await this.client.LINDEX(`messages:${parsedReceiver.conversationId}`, -1) as string; // fetching last updated message
+      const lastMessage: string = await this.client.LINDEX(`messages:${parsedReceiver.conversationId}`, -1) as string;
       return Helpers.parseJson(lastMessage) as IMessageData;
     } catch (error) {
       log.error(error);
@@ -192,7 +192,7 @@ export class MessageCache extends BaseCache {
       }
       const messages: string[] = await this.client.LRANGE(`messages:${conversationId}`, 0, -1);
       const messageIndex: number = findIndex(messages, (listItem: string) => listItem.includes(messageId));
-      const message: string = await this.client.LINDEX(`messages:${conversationId}`, messageIndex) as string; // getting message through index
+      const message: string = await this.client.LINDEX(`messages:${conversationId}`, messageIndex) as string;
       const parsedMessage: IMessageData = Helpers.parseJson(message) as IMessageData;
       const reactions: IReaction[] = [];
       if(parsedMessage) {
@@ -205,7 +205,7 @@ export class MessageCache extends BaseCache {
           await this.client.LSET(`messages:${conversationId}`, messageIndex, JSON.stringify(parsedMessage));
         }
       }
-      const updatedMessage: string = await this.client.LINDEX(`messages:${conversationId}`, messageIndex) as string; // fetching last updated message
+      const updatedMessage: string = await this.client.LINDEX(`messages:${conversationId}`, messageIndex) as string;
       return Helpers.parseJson(updatedMessage) as IMessageData;
     } catch (error) {
       log.error(error);

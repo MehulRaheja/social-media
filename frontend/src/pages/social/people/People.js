@@ -22,7 +22,6 @@ const People = () => {
   const [following, setFollowing] = useState([]);
   const [onlineUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  // const [currentPage, setCurrentPage] = useState(0);
   const pageCount = useRef(1);
   const [totalUsersCount, setTotalUsersCount] = useState(0);
   const bodyRef = useRef(null);
@@ -37,7 +36,6 @@ const People = () => {
     let pageNum = pageCount.current;
     if (pageCount.current <= Math.round(totalUsersCount / PAGE_SIZE)) {
       pageNum += 1;
-      // setCurrentPage(pageNum);
       pageCount.current = pageNum;
       getAllUsers();
     }

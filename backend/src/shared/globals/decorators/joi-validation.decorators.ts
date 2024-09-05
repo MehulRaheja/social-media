@@ -9,7 +9,6 @@ export function joiValidation(schema: ObjectSchema): IJoiDecorator {
   return (_target: any, _key: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;
 
-    // here we'll actually do the validation with joi
     descriptor.value = async function (...args: any[]) {
       const req: Request = args[0];
       const { error } = await Promise.resolve(schema.validate(req.body));

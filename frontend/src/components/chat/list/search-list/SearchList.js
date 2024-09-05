@@ -20,7 +20,6 @@ const SearchList = ({
     setComponentType('searchList');
     setSelectedUser(user);
 
-    // adding query params to the url
     const url = `${location.pathname}?${createSearchParams({ username: user?.username.toLowerCase(), id: user._id })}`;
     navigate(url);
     setSearch('');

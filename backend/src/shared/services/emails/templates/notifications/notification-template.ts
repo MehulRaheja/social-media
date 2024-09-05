@@ -5,7 +5,6 @@ import { INotificationTemplate } from '@notification/interfaces/notification.int
 class NotificationTemplate {
   public notificationMessageTemplate(templateParams: INotificationTemplate): string {
     const { username, header, message } = templateParams;
-    // this will return ejs template file filled dynamic variables' values
     return ejs.render(fs.readFileSync(__dirname + '/notification.ejs', 'utf8'), {
       username,
       header,

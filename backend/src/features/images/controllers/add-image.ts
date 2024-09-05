@@ -23,14 +23,12 @@ export class Add {
     }
     const url = `https://res.cloudinary.com/dlft3yfad/image/upload/v${result.version}/${result.public_id}`;
 
-    // add newly uploaded profile Picture to the cache
     const cachedUser: IUserDocument = await userCache.updateSingleUserItemInCache(
       `${req.currentUser!.userId}`,
       'profilePicture',
       url
     ) as IUserDocument;
     socketIOImageObject.emit('update user', cachedUser);
-    // call image queue to add image to mongodb database
     imageQueue.addImageJob('addUserProfileImageToDB', {
       key: `${req.currentUser!.userId}`,
       value: url,
@@ -59,7 +57,6 @@ export class Add {
       bgImageVersion: version,
       userId: response[0]
     });
-    // call image queue to add image to mongodb database
     imageQueue.addImageJob('updateBGImageInDB', {
       key: `${req.currentUser!.userId}`,
       imgId: publicId,
@@ -69,9 +66,6 @@ export class Add {
   }
 
   private async backgroundUpload(image: string): Promise<IBgUploadResponse> {
-    // we have 2 cases for background image
-    // 1. case: first user is uploading new image, user will send base64 encoded image
-    // 2. case: user is using existing image(previously uploaded) for the background, user will send url of the image
     const isDataURL = Helpers.isDataURL(image);
     let version = '';
     let publicId = '';
@@ -85,9 +79,9 @@ export class Add {
       }
     } else {
       const value = image.split('/');
-      version = value[value.length - 2]; // first character of version string contains v, which we will remove in the return by using regex and replace
+      version = value[value.length - 2];
       publicId = value[value.length - 1];
     }
-    return { version: version.replace(/v/g, ''), publicId }; // version will have 'v' at the start and to remove it we use regex which will check for 'v' in the string
+    return { version: version.replace(/v/g, ''), publicId };
   }
 }

@@ -7,12 +7,12 @@ export interface IMessageDocument extends Document {
   conversationId: mongoose.Types.ObjectId;
   senderId: mongoose.Types.ObjectId;
   receiverId: mongoose.Types.ObjectId;
-  senderUsername: string;  // they are added otherwise additional lookup will be required during chatting
-  senderAvatarColor: string;  // they are added otherwise additional lookup will be required during chatting
-  senderProfilePicture: string;  // they are added otherwise additional lookup will be required during chatting
-  receiverUsername: string;  // they are added otherwise additional lookup will be required during chatting
-  receiverAvatarColor: string;  // they are added otherwise additional lookup will be required during chatting
-  receiverProfilePicture: string;  // they are added otherwise additional lookup will be required during chatting
+  senderUsername: string;
+  senderAvatarColor: string;
+  senderProfilePicture: string;
+  receiverUsername: string;
+  receiverAvatarColor: string;
+  receiverProfilePicture: string;
   body: string;
   gifUrl: string;
   isRead: boolean;

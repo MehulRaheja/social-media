@@ -60,7 +60,7 @@ export class Add {
       senderAvatarColor: `${req.currentUser!.avatarColor}`,
       senderProfilePicture: `${sender.profilePicture}`,
       body,
-      isRead, // becomes true if sender and receiver are both on same chat page
+      isRead,
       gifUrl,
       selectedImage: fileUrl,
       reaction: [],
@@ -80,16 +80,12 @@ export class Add {
       });
     }
 
-    // 1 - add sender to chat list in cache
     await messageCache.addChatListToCache(`${req.currentUser!.userId}`, `${receiverId}`, `${conversationObjectId}`);
 
-    // 2 - add receiver to chat list in cache
     await messageCache.addChatListToCache(`${receiverId}`, `${req.currentUser!.userId}`, `${conversationObjectId}`);
 
-    // 3 - add message data to cache
     await messageCache.addChatMessageToCache(`${conversationObjectId}`, messageData);
 
-    // 4 - add message to chat queue
     chatQueue.addChatJob('addChatMessageToDB', messageData);
 
     res.status(HTTP_STATUS.OK).json({ message: 'Message added', conversationId: conversationObjectId});
@@ -108,13 +104,13 @@ export class Add {
   }
 
   private emitSocketIOEvent(data: IMessageData): void {
-    socketIOChatObject.emit('message received', data); // this will be used to update chat messages
-    socketIOChatObject.emit('chat list', data); // this will be used to update chat list
+    socketIOChatObject.emit('message received', data);
+    socketIOChatObject.emit('chat list', data);
   }
 
   private async messageNotification({ currentUser, message, receiverName, receiverId }: IMessageNotification): Promise<void> {
-    const cachedUser: IUserDocument = await userCache.getUserFromCache(receiverId) as IUserDocument; // get receiver from the cache
-    if(cachedUser.notifications.messages){// check if user has enabled to receive chat notifications
+    const cachedUser: IUserDocument = await userCache.getUserFromCache(receiverId) as IUserDocument;
+    if(cachedUser.notifications.messages){
       const templateParams: INotificationTemplate = {
         username: receiverName,
         message,

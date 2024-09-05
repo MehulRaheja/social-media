@@ -73,7 +73,6 @@ const Post = ({ post, showIcons }) => {
       const bgColor = await ImageUtils.getBackgroundImageColor(imageUrl);
       setBackgroundImageColor(bgColor);
     } catch (error) {
-      // Utils.dispatchNotification(error.response.data.message, 'error', dispatch);
       console.error(error);
     }
   };

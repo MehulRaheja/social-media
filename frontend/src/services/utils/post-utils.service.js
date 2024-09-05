@@ -119,7 +119,6 @@ export class PostUtils {
     return isPrivate || isPublic || isFollower;
   }
 
-  // to set position of the cursor to the right side of the text
   static positionCursor(elementId) {
     const element = document.getElementById(`${elementId}`);
     const selection = window.getSelection();

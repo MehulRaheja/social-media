@@ -21,8 +21,7 @@ const Streams = () => {
   const [posts, setPosts] = useState([]);
   const [following, setFollowing] = useState([]);
   const [loading, setLoading] = useState(true);
-  // const [currentPage, setCurrentPage] = useState(1);
-  const pageCount = useRef(1); // state was time updating on time, so we used ref for page count
+  const pageCount = useRef(1);
   const [totalPostsCount, setTotalPostsCount] = useState(0);
   const bodyRef = useRef(null);
   let appPosts = useRef([]);
@@ -33,14 +32,11 @@ const Streams = () => {
   useInfiniteScroll(bodyRef, bottomLineRef, fetchPostData);
   const PAGE_SIZE = 10;
 
-  // function declaration is used here, because hoisting will throw an error, because function is used in infinite scroll hook,
-  // that function can not be used before difining it,
-  // but with function declaration we can do that
+
   function fetchPostData() {
     let pageNum = pageCount.current;
     if (pageCount.current <= Math.ceil(totalPostsCount / PAGE_SIZE)) {
       pageNum += 1;
-      // setCurrentPage(pageNum);
       pageCount.current = pageNum;
       getAllPosts();
     }
@@ -48,11 +44,10 @@ const Streams = () => {
 
   const getAllPosts = async () => {
     try {
-      // const response = await postService.getAllPosts(currentPage);
       const response = await postService.getAllPosts(pageCount.current);
       if (response.data.posts.length) {
         appPosts = [...posts, ...response.data.posts];
-        const allPosts = uniqBy(appPosts, '_id'); // remove all the duplicate posts on basis of _id
+        const allPosts = uniqBy(appPosts, '_id');
         const orderedPosts = orderBy(allPosts, ['createdAt', 'desc']);
         setPosts(orderedPosts);
       }

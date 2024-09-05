@@ -21,7 +21,7 @@ resource "aws_codedeploy_deployment_group" "code_deploy_app_group" {
     }
   }
 
-  auto_rollback_configuration { # if our deployment fails then we will rollback to previous deployment
+  auto_rollback_configuration {
     enabled = true
     events  = ["DEPLOYMENT_FAILURE"]
   }

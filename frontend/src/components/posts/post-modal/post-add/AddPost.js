@@ -64,8 +64,7 @@ const AddPost = ({ selectedImage, selectedPostVideo }) => {
   const onKeyDown = (event) => {
     const currentTextLength = event.target.textContent.length;
     if (currentTextLength === maxNumberOfCharacters && event.keyCode !== 8) {
-      // keyCode === 8 is for backspace
-      event.preventDefault(); // prevent user from typing any input
+      event.preventDefault();
     }
   };
 

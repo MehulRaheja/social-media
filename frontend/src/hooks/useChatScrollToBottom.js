@@ -12,5 +12,3 @@ const useChatScrollToBottom = (prop) => {
   return scrollRef;
 };
 export default useChatScrollToBottom;
-// scrollHeight: ENTIRE  content & padding (visible or not)
-// clientHeight: VISIBLE content & padding

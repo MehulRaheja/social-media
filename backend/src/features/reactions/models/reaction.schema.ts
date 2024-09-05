@@ -2,7 +2,7 @@ import { IReactionDocument } from '@reaction/interfaces/reaction.interface';
 import mongoose, { model, Model, Schema } from 'mongoose';
 
 const reactionSchema: Schema = new Schema({
-  postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', index: true }, // we will search reactions on basis of postId, that's why index: true
+  postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', index: true },
   type: { type: String, default: '' },
   username: { type: String, default: '' },
   avataColor: { type: String, default: '' },

@@ -9,7 +9,6 @@ class UserWorker {
   async addUserToDB(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { value } = job.data;
-      // add method to send data to database
       await userService.addUserData(value);
       job.progress(100);
       done(null, job.data);
@@ -22,7 +21,6 @@ class UserWorker {
   async updateUserInfo(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { key, value } = job.data;
-      // add method to send data to database
       await userService.updateUserInfo(key, value);
       job.progress(100);
       done(null, job.data);
@@ -35,7 +33,6 @@ class UserWorker {
   async updateSocialLinks(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { key, value } = job.data;
-      // add method to send data to database
       await userService.updateSocialLinks(key, value);
       job.progress(100);
       done(null, job.data);
@@ -48,7 +45,6 @@ class UserWorker {
   async updateNotificationSettings(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { key, value } = job.data;
-      // add method to send data to database
       await userService.updateNotificationSettings(key, value);
       job.progress(100);
       done(null, job.data);

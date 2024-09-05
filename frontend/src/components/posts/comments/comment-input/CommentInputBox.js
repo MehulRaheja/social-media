@@ -15,7 +15,7 @@ const CommentInputBox = ({ post }) => {
   const dispatch = useDispatch();
 
   const submitComment = async (event) => {
-    event.preventDefault(); // don't want page to be reloaded once the form is submitted
+    event.preventDefault();
     try {
       post = cloneDeep(post);
       post.commentsCount += 1;
@@ -36,7 +36,7 @@ const CommentInputBox = ({ post }) => {
 
   useEffect(() => {
     if (commentInputRef?.current) {
-      commentInputRef.current.focus(); // to set focus inside the input element
+      commentInputRef.current.focus();
     }
   }, []);
 

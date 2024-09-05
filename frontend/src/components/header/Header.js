@@ -79,10 +79,9 @@ const Header = () => {
   };
 
   const onDeleteNotification = async (messageId) => {
-    // event.stopPropagation(); // it will stop the propagation on the tree, only affect the specific icon not the entire div
     try {
       const response = await notificationService.deleteNotification(messageId);
-      Utils.dispatchNotification(response.data.message, 'success', dispatch); // if deletion is successful then we will show success notification
+      Utils.dispatchNotification(response.data.message, 'success', dispatch);
     } catch (error) {
       Utils.dispatchNotification(error.response.data.message, 'error', dispatch);
     }
@@ -131,7 +130,6 @@ const Header = () => {
   useEffect(() => {
     const env = Utils.appEnvironment();
     setEnvironment(env);
-    // sumBy is used to calculate the sum based on a condition
     const count = sumBy(chatList, (notification) => {
       return !notification.isRead && notification.receiverUsername === profile?.username ? 1 : 0;
     });

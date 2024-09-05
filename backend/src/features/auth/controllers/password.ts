@@ -23,7 +23,6 @@ export class Password {
       throw new BadRequestError('Invalid Credentials');
     }
 
-    // generate random characters(buffer) of length 20
     const randomBytes: Buffer = await Promise.resolve(crypto.randomBytes(20));
     const randomCharacters: string = randomBytes.toString('hex');
     await authService.updatePasswordToken(`${existingUser._id}`, randomCharacters, Date.now() * 60 * 60 * 1000); // token will be valid for 1 hour
@@ -39,7 +38,6 @@ export class Password {
     const { password, confirmPassword } = req.body;
     const { token } = req.params;
     if (password !== confirmPassword) {
-      // validation decorator is also doing this validation
       throw new BadRequestError('Passwords do not match');
     }
     const existingUser: IAuthDocument = await authService.getAuthUserByPasswordToken(token);

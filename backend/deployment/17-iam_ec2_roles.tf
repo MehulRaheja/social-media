@@ -1,5 +1,4 @@
-# we create ec2 role policy and instance profile
-# we will attach this role to every instance created by our autoscaling group
+
 resource "aws_iam_role" "ec2_iam_role" {
   name = var.ec2_iam_role_name
   assume_role_policy = jsonencode({
@@ -19,7 +18,6 @@ resource "aws_iam_role" "ec2_iam_role" {
 resource "aws_iam_role_policy" "ec2_iam_role_policy" {
   name = var.ec2_iam_role_policy_name
   role = aws_iam_role.ec2_iam_role.id
-  # EOF means end of file
   policy = <<EOF
 {
   "Version" : "2012-10-17",

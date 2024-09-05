@@ -39,7 +39,6 @@ const Sidebar = () => {
     } else {
       navigate(url);
     }
-    // after closing the page socket still receives messages, so closing the socket to stop memory leaks
     socketService?.socket.off('message received');
   };
 

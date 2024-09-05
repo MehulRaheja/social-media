@@ -1,5 +1,4 @@
-# Public subnets
-# They are used to launch instances for public internet access
+
 resource "aws_subnet" "public_subnet_a" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.vpc_public_subnets[0]
@@ -24,8 +23,6 @@ resource "aws_subnet" "public_subnet_b" {
   )
 }
 
-# Private subnets
-# They are used to launch instances where we don't want direct public internet access
 resource "aws_subnet" "private_subnet_a" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = var.vpc_private_subnets[0]

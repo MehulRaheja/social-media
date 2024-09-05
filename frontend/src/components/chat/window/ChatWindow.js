@@ -95,7 +95,6 @@ const ChatWindow = () => {
     }
   };
 
-  // rendered is used to call useEffect only once
   useEffect(() => {
     if (rendered) {
       getUserProfileByUserId();

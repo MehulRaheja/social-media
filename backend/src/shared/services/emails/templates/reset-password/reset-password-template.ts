@@ -6,7 +6,6 @@ class ResetPasswordTemplate {
   public passwordResetConfirmationTemplate(templateParams: IResetPasswordParams): string {
     const { username, email, ipaddress, date } = templateParams;
 
-    // this will return ejs template file filled dynamic variables' values
     return ejs.render(fs.readFileSync(__dirname + '/reset-password-template.ejs', 'utf8'), {
       username,
       email,

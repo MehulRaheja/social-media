@@ -1,5 +1,4 @@
-# Here we will create a private route table
-# private route table needs to be attach to private subnet
+
 resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.main.id
 

@@ -9,7 +9,6 @@ import HTTP_STATUS from 'http-status-codes';
 import { Server } from 'socket.io';
 import { createClient } from 'redis';
 import { createAdapter } from '@socket.io/redis-adapter';
-// @socket.io/redis-adapter: if a user who was connected to socket and connects again then this library will maintain the connection
 import Logger from 'bunyan';
 import apiStats from 'swagger-stats';
 import 'express-async-errors';
@@ -24,7 +23,7 @@ import { SocketIOImageHandler } from '@socket/image';
 import { SocketIOChatHandler } from '@socket/chat';
 
 const SERVER_PORT = 5000;
-const log: Logger = config.createLogger('server'); // whenever we see log/error with the name server, means it is coming from server file.
+const log: Logger = config.createLogger('server');
 
 export class ServerSetup {
   private app: Application;
@@ -33,7 +32,6 @@ export class ServerSetup {
     this.app = app;
   }
 
-  // All the private methods will be called inside this function
   public start(): void {
     this.securityMiddleware(this.app);
     this.standardMiddleware(this.app);
@@ -46,18 +44,18 @@ export class ServerSetup {
   private securityMiddleware(app: Application): void {
     app.use(
       cookieSession({
-        name: 'session', // while applying load-balancer on aws this name will be required
-        keys: [config.SECRET_KEY_ONE!, config.SECRET_KEY_TWO!], // ! will remove the error
+        name: 'session',
+        keys: [config.SECRET_KEY_ONE!, config.SECRET_KEY_TWO!],
         maxAge: 24 * 7 * 3600000, // cookie will be valid for 7 days
-        secure: config.NODE_ENV !== 'development' // false means it can be used for http as well, it's okay for local environment
+        secure: config.NODE_ENV !== 'development'
       })
     );
     app.use(hpp());
     app.use(helmet());
     app.use(
       cors({
-        origin: config.CLIENT_URL, // later '*' will be replaced client url
-        credentials: true, // to use cookie, set this to true
+        origin: config.CLIENT_URL,
+        credentials: true,
         optionsSuccessStatus: 200,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
       })
@@ -76,23 +74,18 @@ export class ServerSetup {
 
   private apiMonitoring(app: Application): void {
     app.use(
-      apiStats.getMiddleware({ // we can pass multiple options here
-        uriPath: '/api-monitoring' // for api monitoring in the browser
+      apiStats.getMiddleware({
+        uriPath: '/api-monitoring'
       })
     );
   }
 
-  // Global error handler to handle entire application's errors and send it to client
   private globalErrorHandler(app: Application): void {
-    // finding url related errors for all the routes
 
-    // throwing error when requested url is not found
     app.all('*', (req: Request, res: Response) => {
       res.status(HTTP_STATUS.NOT_FOUND).json({ message: `${req.originalUrl} not found` });
     });
 
-    // if it relates to any error class which is created extending CustomError class then this method will throw that error
-    // we put _ in front of req because we are not using it
     app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
       log.error(error);
       if (error instanceof CustomError) {
@@ -117,7 +110,6 @@ export class ServerSetup {
   }
 
   private async createSocketIO(httpServer: http.Server): Promise<Server> {
-    // create socket instance
     const io: Server = new Server(httpServer, {
       cors: {
         origin: config.CLIENT_URL,
@@ -125,9 +117,8 @@ export class ServerSetup {
       }
     });
 
-    // create redis client
-    const pubClient = createClient({ url: config.REDIS_CLIENT }); // this will create client for publishing
-    const subClient = pubClient.duplicate(); // this will create client for subscription
+    const pubClient = createClient({ url: config.REDIS_CLIENT });
+    const subClient = pubClient.duplicate();
     await Promise.all([pubClient.connect(), subClient.connect()]);
     io.adapter(createAdapter(pubClient, subClient));
     return io;
@@ -141,7 +132,6 @@ export class ServerSetup {
     });
   }
 
-  // every socket connection we'll create will be define here
   private socketIOConnetions(io: Server): void {
     const postSocketHandler: SocketIOPostHandler = new SocketIOPostHandler(io);
     const followerSocketHandler: SocketIOFollowerHandler = new SocketIOFollowerHandler(io);

@@ -6,7 +6,7 @@ resource "aws_autoscaling_group" "ec2_autoscaling_group" {
   desired_capacity          = 1
   launch_configuration      = aws_launch_configuration.asg_launch_configuration.name
   health_check_type         = "ELB"
-  health_check_grace_period = 600 # 10 min because we need time for libraries to get installed
+  health_check_grace_period = 600
   default_cooldown          = 150
   force_delete              = true
   target_group_arns         = [aws_alb_target_group.server_backend_tg.arn]
@@ -26,7 +26,6 @@ resource "aws_autoscaling_group" "ec2_autoscaling_group" {
     aws_elasticache_replication_group.chatapp_redis_cluster
   ]
 
-  # another way of adding tag
   tag {
     key                 = "Name"
     value               = "EC2-ASG-${terraform.workspace}"

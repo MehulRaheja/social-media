@@ -6,8 +6,7 @@ import { CustomError } from '@global/helpers/error-handler';
 import { authService } from '@service/db/auth.service';
 import { UserCache } from '@service/redis/user.cache';
 
-jest.useFakeTimers(); // to fake setTimeout and setInterval methods
-// here we mock all the methods that are required for signup because we don't want to use the actual implementation
+jest.useFakeTimers();
 jest.mock('@service/queues/base.queue');
 jest.mock('@service/redis/user.cache');
 jest.mock('@service/queues/user.queue');
@@ -16,12 +15,12 @@ jest.mock('@global/helpers/cloudinary-upload');
 
 describe('SignUp', () => {
   beforeEach(() => {
-    jest.resetAllMocks(); // before starting any test it will reset all the mocked functions
+    jest.resetAllMocks();
   });
 
   afterEach(() => {
-    jest.clearAllMocks(); // all mock functions of the test will be clear here
-    jest.clearAllTimers(); // all the fake timeout and interval methods will be cleared here
+    jest.clearAllMocks();
+    jest.clearAllTimers();
   });
 
   it('should throw an error if username is not available', () => {
@@ -34,8 +33,6 @@ describe('SignUp', () => {
     }) as Request;
     const res: Response = authMockResponse();
 
-    // we will use the catch method to get the error
-    // joiValidator is using our custom error handler so the type of the error will be of CustomError
     SignUp.prototype.create(req, res).catch((error: CustomError) => {
       expect(error.statusCode).toEqual(400);
       expect(error.serializeErrors().message).toEqual('Username is a required field');
@@ -52,8 +49,6 @@ describe('SignUp', () => {
     }) as Request;
     const res: Response = authMockResponse();
 
-    // we will use the catch method to get the error
-    // joiValidator is using our custom error handler so the type of the error will be of CustomError
     SignUp.prototype.create(req, res).catch((error: CustomError) => {
       expect(error.statusCode).toEqual(400);
       expect(error.serializeErrors().message).toEqual('Invalid username');
@@ -70,8 +65,6 @@ describe('SignUp', () => {
     }) as Request;
     const res: Response = authMockResponse();
 
-    // we will use the catch method to get the error
-    // joiValidator is using our custom error handler so the type of the error will be of CustomError
     SignUp.prototype.create(req, res).catch((error: CustomError) => {
       expect(error.statusCode).toEqual(400);
       expect(error.serializeErrors().message).toEqual('Invalid username');
@@ -88,8 +81,6 @@ describe('SignUp', () => {
     }) as Request;
     const res: Response = authMockResponse();
 
-    // we will use the catch method to get the error
-    // joiValidator is using our custom error handler so the type of the error will be of CustomError
     SignUp.prototype.create(req, res).catch((error: CustomError) => {
       expect(error.statusCode).toEqual(400);
       expect(error.serializeErrors().message).toEqual('Email must be valid');
@@ -105,8 +96,6 @@ describe('SignUp', () => {
     }) as Request;
     const res: Response = authMockResponse();
 
-    // we will use the catch method to get the error
-    // joiValidator is using our custom error handler so the type of the error will be of CustomError
     SignUp.prototype.create(req, res).catch((error: CustomError) => {
       expect(error.statusCode).toEqual(400);
       expect(error.serializeErrors().message).toEqual('"email" is required');
@@ -123,8 +112,6 @@ describe('SignUp', () => {
     }) as Request;
     const res: Response = authMockResponse();
 
-    // we will use the catch method to get the error
-    // joiValidator is using our custom error handler so the type of the error will be of CustomError
     SignUp.prototype.create(req, res).catch((error: CustomError) => {
       expect(error.statusCode).toEqual(400);
       expect(error.serializeErrors().message).toEqual('Password is a required field');
@@ -141,8 +128,6 @@ describe('SignUp', () => {
     }) as Request;
     const res: Response = authMockResponse();
 
-    // we will use the catch method to get the error
-    // joiValidator is using our custom error handler so the type of the error will be of CustomError
     SignUp.prototype.create(req, res).catch((error: CustomError) => {
       expect(error.statusCode).toEqual(400);
       expect(error.serializeErrors().message).toEqual('Invalid Password');
@@ -159,8 +144,6 @@ describe('SignUp', () => {
     }) as Request;
     const res: Response = authMockResponse();
 
-    // we will use the catch method to get the error
-    // joiValidator is using our custom error handler so the type of the error will be of CustomError
     SignUp.prototype.create(req, res).catch((error: CustomError) => {
       expect(error.statusCode).toEqual(400);
       expect(error.serializeErrors().message).toEqual('Invalid Password');
@@ -177,7 +160,7 @@ describe('SignUp', () => {
     }) as Request;
     const res: Response = authMockResponse();
 
-    jest.spyOn(authService, 'getUserByUsernameOrEmail').mockResolvedValue(authMock); // we mocked 'getUserByUsernameOrEmail' this function here
+    jest.spyOn(authService, 'getUserByUsernameOrEmail').mockResolvedValue(authMock);
     SignUp.prototype.create(req, res).catch((error: CustomError) => {
       expect(error.statusCode).toEqual(400);
       expect(error.serializeErrors().message).toEqual('Invalid credentials');
@@ -194,7 +177,7 @@ describe('SignUp', () => {
     }) as Request;
     const res: Response = authMockResponse();
 
-    const userSpy = jest.spyOn(UserCache.prototype, 'saveUserToCache'); // spying on this method will not work if we call it on authService, so we have directly call it on userCache class
+    const userSpy = jest.spyOn(UserCache.prototype, 'saveUserToCache');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     jest.spyOn(authService, 'getUserByUsernameOrEmail').mockResolvedValue(null as any); // we mocked 'getUserByUsernameOrEmail' this function here
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

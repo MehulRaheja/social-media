@@ -22,7 +22,7 @@ export class FollowerCache extends BaseCache {
       if(!this.client.isOpen){
         await this.client.connect();
       }
-      await this.client.LPUSH(key, value); // add followee _id to the followers list
+      await this.client.LPUSH(key, value);
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again.');
@@ -34,7 +34,7 @@ export class FollowerCache extends BaseCache {
       if(!this.client.isOpen){
         await this.client.connect();
       }
-      await this.client.LREM(key, 1, value); // remove followee _id to the followers list
+      await this.client.LREM(key, 1, value);
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again.');
@@ -46,7 +46,7 @@ export class FollowerCache extends BaseCache {
       if(!this.client.isOpen){
         await this.client.connect();
       }
-      await this.client.HINCRBY(`users:${userId}`, prop, value); // HINCRBY method in redis increases the value of numerical field by a particular number, it is used here to increase or decrease the follower or followee count conditionally
+      await this.client.HINCRBY(`users:${userId}`, prop, value);
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again.');
@@ -58,7 +58,7 @@ export class FollowerCache extends BaseCache {
       if(!this.client.isOpen){
         await this.client.connect();
       }
-      const response: string[] = await this.client.LRANGE(key, 0, -1); // get all the elements from redis cache associated with the list of the key
+      const response: string[] = await this.client.LRANGE(key, 0, -1);
       const list: IFollowerData[] = [];
       for(const item of response) {
         const user: IUserDocument = await userCache.getUserFromCache(item) as IUserDocument;
@@ -94,7 +94,7 @@ export class FollowerCache extends BaseCache {
       if(type === 'block') {
         blocked = [...blocked, value];
       } else {
-        remove(blocked, (id: string) => id === value); // removing id of blocked user from the blocked list
+        remove(blocked, (id: string) => id === value);
         blocked = [...blocked];
       }
       multi.HSET(`users:${key}`, `${prop}`, JSON.stringify(blocked));

@@ -16,8 +16,6 @@ const authSchema: Schema = new Schema(
     passwordResetExpires: { type: Number },
   },
   {
-    // when we return the authSchema document, password field will be removed from it.
-    // if we don't want to return any other property upon query, just delete it here.
     toJSON: {
       transform(_doc, ret) {
         delete ret.password;
@@ -27,8 +25,6 @@ const authSchema: Schema = new Schema(
   }
 );
 
-// below method will hash the password before we save it to the database
-// this refers to the particular document that has been created
 authSchema.pre('save', async function (this: IAuthDocument, next: () => void) {
   const hashedPassword: string = await hash(this.password as string, SALT_ROUND);
   this.password = hashedPassword;
@@ -40,7 +36,6 @@ authSchema.methods.comparePassword = async function (password: string): Promise<
   return compare(password, hashedPassword);
 };
 
-// this method will be used when user try to its password
 authSchema.methods.hashPassword = async function (password: string): Promise<string> {
   return hash(password, SALT_ROUND);
 };

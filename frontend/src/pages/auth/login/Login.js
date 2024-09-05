@@ -35,11 +35,8 @@ const Login = () => {
       });
       setHasError(false);
       setAlertType('alert-success');
-      // 1 - set logged in to true in local storage
       setLoggedIn(keepLoggedIn);
-      // 2 - set username in local storage
       setStoredUsername(username);
-      // 3 - dispatch user to redux
       Utils.dispatchUser(result, pageReload, dispatch, setUser);
     } catch (error) {
       setLoading(false);

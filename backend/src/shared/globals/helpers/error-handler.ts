@@ -13,7 +13,6 @@ export interface IError {
   status: string;
 }
 
-// abstract class can not be instantiated directly but can be used as a subclass and provide its abstract methods to its parent class
 export abstract class CustomError extends Error {
   abstract statusCode: number;
   abstract status: string;

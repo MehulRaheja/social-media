@@ -19,14 +19,13 @@ class ReactionService {
   public async addReactionDataToDB(reactionData: IReactionJob): Promise<void> {
     const { postId, userTo, userFrom, username, type, previousReaction, reactionObject } = reactionData;
 
-    // if there is a previous reaction then we will remove _id from the reactionData
     let updatedReactionObject: IReactionDocument = reactionObject as IReactionDocument;
     if (previousReaction){
       updatedReactionObject = omit(reactionObject, ['_id']);
     }
     const updateReaction: [IUserDocument, IReactionDocument, IPostDocument] = await Promise.all([
       userCache.getUserFromCache(`${userTo}`),
-      ReactionModel.replaceOne({ postId, type: previousReaction, username }, updatedReactionObject, { upsert: true }), // replace old reaction document with new reaction document
+      ReactionModel.replaceOne({ postId, type: previousReaction, username }, updatedReactionObject, { upsert: true }),
       PostModel.findOneAndUpdate(
         { _id: postId },
         {
@@ -39,9 +38,8 @@ class ReactionService {
       )
     ]) as unknown as [IUserDocument, IReactionDocument, IPostDocument];
 
-    // send reaction notification
-    if(updateReaction[0]?.notifications.reactions && userTo !== userFrom) { // userFrom !== userTo is to check that user doesn't receive any notification from its own actions
-      const notificationModel: INotificationDocument = new NotificationModel(); // because we want to use our own defined method, we need to initiate the notification model class like this
+    if(updateReaction[0]?.notifications.reactions && userTo !== userFrom) {
+      const notificationModel: INotificationDocument = new NotificationModel();
       const notifications = await notificationModel.insertNotification({
         userFrom: userFrom as string,
         userTo: userTo as string,
@@ -58,7 +56,6 @@ class ReactionService {
         reaction: type!
       });
       socketIONotificationObject.emit('insert notification', notifications, { userTo });
-      // send to email queue
       const templateParams: INotificationTemplate = {
         username: updateReaction[0].username!,
         message: `${username} reacted to your post.`,

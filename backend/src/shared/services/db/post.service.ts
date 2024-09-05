@@ -6,7 +6,7 @@ import { Query, UpdateQuery } from 'mongoose';
 
 class PostService {
   public async addPostToDB(userId: string, createdPost: IPostDocument): Promise<void> {
-    const post: Promise<IPostDocument> = PostModel.create(createdPost);  // we didn't use await here instead we use Promise because our next method is promiseall and await method will add one more step
+    const post: Promise<IPostDocument> = PostModel.create(createdPost);
     const user: UpdateQuery<IUserDocument> = UserModel.updateOne({ _id: userId }, { $inc: { postsCount: 1}});
     await Promise.all([ post, user ]);
   }
@@ -31,7 +31,6 @@ class PostService {
 
   public async deletePost(postId: string, userId: string): Promise<void> {
     const deletePost: Query<IQueryComplete & IQueryDeleted, IPostDocument> = PostModel.deleteOne({ _id: postId });
-    // delete reactions here
     const decrementPostCount: UpdateQuery<IUserDocument> = UserModel.updateOne({ _id: userId }, { $inc: { postsCount: -1 }});
     await Promise.all([deletePost, decrementPostCount]);
   }

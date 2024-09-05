@@ -5,11 +5,10 @@ import { authWorker } from '@worker/auth.worker';
 class AuthQueue extends BaseQueue {
   constructor() {
     super('auth');
-    this.processJob('addAuthUserToDB', 5, authWorker.addAuthUserToDB); // this method will process job in the queue
+    this.processJob('addAuthUserToDB', 5, authWorker.addAuthUserToDB);
   }
 
   public addAuthUserJob(name: string, data: IAuthJob): void {
-    // this method will add job to the queue
     this.addJob(name, data);
   }
 }

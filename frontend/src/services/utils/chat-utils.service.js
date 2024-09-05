@@ -8,7 +8,6 @@ export class ChatUtils {
   static chatUsers = [];
 
   static usersOnline(setOnlineUsers) {
-    // data prop is an array which contains users that are online
     socketService?.socket?.on('user online', (data) => {
       setOnlineUsers(data);
     });
@@ -46,7 +45,6 @@ export class ChatUtils {
     return params;
   }
 
-  // construct an object of message data send to backend
   static messageData({
     receiver,
     message,
@@ -76,7 +74,6 @@ export class ChatUtils {
     return messageData;
   }
 
-  // to update chat users
   static updatedSelectedChatUser({
     chatMessageList,
     profile,
@@ -88,7 +85,6 @@ export class ChatUtils {
     dispatch
   }) {
     if (chatMessageList.length) {
-      // for user, show first msg of their list
       dispatch(setSelectedChatUser({ isLoading: false, user: chatMessageList[0] }));
       navigate(`${pathname}?${createSearchParams(params)}`);
     } else {
@@ -98,7 +94,6 @@ export class ChatUtils {
         (user) => user.userOne === profile?.username && user?.userTwo.toLowerCase() === username
       );
       if (sender) {
-        // remove chat users
         chatService.removeChatUsers(sender);
       }
     }

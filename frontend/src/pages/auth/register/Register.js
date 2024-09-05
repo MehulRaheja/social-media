@@ -37,11 +37,8 @@ const Register = () => {
         avatarColor,
         avatarImage
       });
-      // 1 - set logged in to true in local storage
       setLoggedIn(true);
-      // 2 - set username in local storage
       setStoredUsername(username);
-      // 3 - dispatch user to redux
       Utils.dispatchUser(result, pageReload, dispatch, setUser);
       setAlertType('alert-success');
     } catch (error) {

@@ -19,20 +19,19 @@ export class Utils {
     context.fillStyle = backgroundColor;
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw text on the canvas
     context.font = 'normal 80px sans-serif';
     context.fillStyle = forgroundColor;
     context.textAlign = 'center';
     context.textBaseline = 'middle';
     context.fillText(text, canvas.width / 2, canvas.height / 2);
 
-    return canvas.toDataURL('image/png'); // toDataURL: to convert canvas into base64 string
+    return canvas.toDataURL('image/png');
   }
 
   static dispatchUser(result, pageReload, dispatch, setUser) {
-    pageReload(true); // coming from session storage
-    dispatch(addUser({ token: result.data.token, profile: result.data.user })); // adding to redux
-    setUser(result.data.user); // setting user to local state
+    pageReload(true);
+    dispatch(addUser({ token: result.data.token, profile: result.data.user }));
+    setUser(result.data.user);
   }
 
   static clearStore({ dispatch, deleteStorageUsername, deleteSessionPageReload, setLoggedIn }) {

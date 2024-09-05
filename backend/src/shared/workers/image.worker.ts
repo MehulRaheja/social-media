@@ -9,7 +9,6 @@ class ImageWorker {
   async addUserProfileImageToDB(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { key, value, imgId, imgVersion } = job.data;
-      // add method to send data ot database
       await imageService.addUserProfileImageToDB(key, value, imgId, imgVersion);
       job.progress(100);
       done(null, job.data);
@@ -22,7 +21,6 @@ class ImageWorker {
   async updateBGImageInDB(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { key, imgId, imgVersion } = job.data;
-      // add method to send data ot database
       await imageService.addBackgroundImageToDB(key, imgId, imgVersion);
       job.progress(100);
       done(null, job.data);
@@ -35,7 +33,6 @@ class ImageWorker {
   async addImageToDB(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { key, imgId, imgVersion } = job.data;
-      // add method to send data ot database
       await imageService.addImage(key, imgId, imgVersion, '');
       job.progress(100);
       done(null, job.data);
@@ -48,7 +45,6 @@ class ImageWorker {
   async removeImageFromDB(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { imageId } = job.data;
-      // add method to send data ot database
       await imageService.removeImageFromDB(imageId);
       job.progress(100);
       done(null, job.data);

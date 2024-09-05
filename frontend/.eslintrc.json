@@ -15,7 +15,7 @@
     "plugins": ["react", "jest", "prettier"],
     "settings": {
       "react": {
-        "version": "detect" // Automatically detect the react version
+        "version": "detect"
       },
       "jest": {
         "version": "detect",
@@ -36,4 +36,3 @@
       "react/display-name": 0
     }
   }
-  

@@ -51,7 +51,6 @@ export class ImageUtils {
     );
   }
 
-  // to convert file into base64
   static readAsBase64(file) {
     const reader = new FileReader();
     const fileValue = new Promise((resolve, reject) => {
@@ -68,7 +67,6 @@ export class ImageUtils {
     return fileValue;
   }
 
-  // to get background color for image from the image
   static getBackgroundImageColor(imageUrl) {
     const image = new Image();
     image.crossOrigin = 'Anonymous';
@@ -81,7 +79,7 @@ export class ImageUtils {
         context.drawImage(image, 0, 0);
 
         const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        const params = imageData.data; // this will give rgb values in as array
+        const params = imageData.data;
         const bgColor = ImageUtils.convertRGBToHex(params[0], params[1], params[2]);
         resolve(bgColor);
       });

@@ -7,7 +7,6 @@ class UserService {
   }
 
   async logoutUser() {
-    // we are storing the data in cookie, so this function will clear the cookie
     const response = await axios.get('/signout');
     return response;
   }

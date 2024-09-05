@@ -17,13 +17,11 @@ const BASE_PATH = '/api/v1';
 
 export default (app: Application) => {
   const routes = () => {
-    // this is for GUI of route /queues
-    // there is no requirement of BASE_PATH
     app.use('/queues', serverAdapter.getRouter());
-    app.use('', healthRoutes.health()); // while using aws ec2 and load balancer it will be required to check the health of the instance, for healthy route it will return 200
-    app.use('', healthRoutes.env()); // this will display the exact environment on which we are on
-    app.use('', healthRoutes.instance()); // to get the ec2 instance id of currently running service
-    app.use('', healthRoutes.fiboRoutes()); // to put heavy load on the server to check its performance
+    app.use('', healthRoutes.health());
+    app.use('', healthRoutes.env());
+    app.use('', healthRoutes.instance());
+    app.use('', healthRoutes.fiboRoutes());
 
     app.use(BASE_PATH, authRoutes.routes());
     app.use(BASE_PATH, authRoutes.signoutRoute());

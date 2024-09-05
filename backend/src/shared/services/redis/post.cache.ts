@@ -66,38 +66,32 @@ export class PostCache extends BaseCache {
       }
 
       const postCount: string[] = await this.client.HMGET(`users:${currentUserId}`, 'postsCount');
-      // multi method in redis is used to call multiple redis commands
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       await this.client.ZADD('post', { score: parseInt(uId, 10), value: `${key}` });
-      // multi.ZADD('post', { score: parseInt(uId, 10), value: `${key}` });
       for(const [itemKey, itemValue] of Object.entries(dataToSave)) {
         multi.HSET(`posts:${key}`, `${itemKey}`, `${itemValue}`);
       }
       const count: number = parseInt(postCount[0], 10) + 1;
       multi.HSET(`users:${currentUserId}`, 'postsCount', count);
-      multi.exec(); // this will execute all the methods which are chained with multi
+      multi.exec();
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. try again.');
     }
   }
 
-  // we have implemented pagination here because we don't want to get all the posts at once
-  // we want to get posts in reverse order latest first
   public async getPostsFromCache(key: string, start: number, end: number): Promise<IPostDocument[]> {
     try {
       if (!this.client.isOpen) {
         await this.client.connect();
       }
 
-      // returns the array of zadd ids
       const reply: string[] = await this.client.ZRANGE(key, start, end, { REV: true });
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for(const value of reply) {
         multi.HGETALL(`posts:${value}`);
       }
 
-      // we are expecting replies to return a type of IPostDocument array, so we need to create a type for it which contains all the types that can be expected from replies.
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       const postReplies: IPostDocument[] = [];
       for(const post of replies as IPostDocument[]){
@@ -133,14 +127,12 @@ export class PostCache extends BaseCache {
         await this.client.connect();
       }
 
-      // returns the array of zadd ids
       const reply: string[] = await this.client.ZRANGE(key, start, end, { REV: true });
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for(const value of reply) {
         multi.HGETALL(`posts:${value}`);
       }
 
-      // we are expecting replies to return a type of IPostDocument array, so we need to create a type for it which contains all the types that can be expected from replies.
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       const postWithImages: IPostDocument[] = [];
       for(const post of replies as IPostDocument[]){
@@ -165,14 +157,12 @@ export class PostCache extends BaseCache {
         await this.client.connect();
       }
 
-      // returns the array of zadd ids
       const reply: string[] = await this.client.ZRANGE(key, start, end, { REV: true });
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for(const value of reply) {
         multi.HGETALL(`posts:${value}`);
       }
 
-      // we are expecting replies to return a type of IPostDocument array, so we need to create a type for it which contains all the types that can be expected from replies.
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       const postWithVideos: IPostDocument[] = [];
       for(const post of replies as IPostDocument[]){
@@ -197,14 +187,12 @@ export class PostCache extends BaseCache {
         await this.client.connect();
       }
 
-      // returns the array of zadd ids
-      const reply: string[] = await this.client.ZRANGE(key, uId, uId, { REV: true, BY: 'SCORE' }); // getting post by score in reverse order
+      const reply: string[] = await this.client.ZRANGE(key, uId, uId, { REV: true, BY: 'SCORE' });
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for(const value of reply) {
         multi.HGETALL(`posts:${value}`);
       }
 
-      // we are expecting replies to return a type of IPostDocument array, so we need to create a type for it which contains all the types that can be expected from replies.
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       const postReplies: IPostDocument[] = [];
       for(const post of replies as IPostDocument[]){
@@ -226,7 +214,7 @@ export class PostCache extends BaseCache {
       if (!this.client.isOpen) {
         await this.client.connect();
       }
-      const count: number = await this.client.ZCOUNT('post', uId, uId); // ZCOUNT is used because we can also add other properties as well
+      const count: number = await this.client.ZCOUNT('post', uId, uId);
       return count;
     } catch (error) {
       log.error(error);
@@ -240,14 +228,11 @@ export class PostCache extends BaseCache {
         await this.client.connect();
       }
       const postCount: string[] = await this.client.HMGET(`users:${currentUserId}`, 'postsCount');
-      // multi method in redis is used to call multiple redis commands
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
-      //ZREM is used to remove an item from the set
       multi.ZREM('post', `${key}`);
-      //DEL is for delete
-      multi.DEL(`posts:${key}`); // This will take the hash and delete the entire post/items related to that hash
-      multi.DEL(`comments:${key}`); // This will take the hash and delete the all comments related to that hash
-      multi.DEL(`reactions:${key}`); // This will take the hash and delete the all comments related to that hash
+      multi.DEL(`posts:${key}`);
+      multi.DEL(`comments:${key}`);
+      multi.DEL(`reactions:${key}`);
       const count: number = parseInt(postCount[0], 10) - 1;
       multi.HSET(`users:${currentUserId}`, 'postsCount', count);
       await multi.exec();
@@ -276,12 +261,12 @@ export class PostCache extends BaseCache {
         await this.client.connect();
       }
       for(const [itemKey, itemValue] of Object.entries(dataToSave)) {
-        await this.client.HSET(`posts:${key}`, `${itemKey}`, `${itemValue}`); // update post's fields are saved in the cache
+        await this.client.HSET(`posts:${key}`, `${itemKey}`, `${itemValue}`);
       }
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
-      multi.HGETALL(`posts:${key}`); // get the complete hash
-      const reply: PostCacheMultiType = await multi.exec() as PostCacheMultiType; // data we get doesn't have any type so we created a special type which is assigned to it
-      const postReply = reply as IPostDocument[]; // we can't use reply because of its type, here we assign it to a new type which we want to return
+      multi.HGETALL(`posts:${key}`);
+      const reply: PostCacheMultiType = await multi.exec() as PostCacheMultiType;
+      const postReply = reply as IPostDocument[];
       postReply[0].commentsCount = Helpers.parseJson(`${postReply[0].commentsCount}`) as number;
       postReply[0].reactions = Helpers.parseJson(`${postReply[0].reactions}`) as IReactions;
       postReply[0].createdAt = new Date(Helpers.parseJson(`${postReply[0].createdAt}`)) as Date;

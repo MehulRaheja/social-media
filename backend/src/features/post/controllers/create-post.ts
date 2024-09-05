@@ -90,7 +90,6 @@ export class Create {
       createdPost
     });
     postQueue.addPostJob('addPostToDB', { key: req.currentUser!.userId, value: createdPost});
-    // call image queue to add image to mongodb database
     imageQueue.addImageJob('addImageToDB', {
       key: `${req.currentUser!.userId}`,
       imgId: result.public_id,
@@ -138,8 +137,6 @@ export class Create {
       createdPost
     });
     postQueue.addPostJob('addPostToDB', { key: req.currentUser!.userId, value: createdPost});
-
-    // !!!!! CAUTION !!!!!!! separate video collection is not created like it is for images, so video list and option to add to add previously uploaded video can't be used in a new post. If it is required then whole feature needs to be created
 
     res.status(HTTP_STATUS.CREATED).json({ message: 'Post created with video successfully'});
   }

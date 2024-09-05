@@ -9,7 +9,6 @@ class ReactionWorker {
   async addReactionToDB(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { data } = job;
-      // add method to send data to database
       await reactionService.addReactionDataToDB(data);
       job.progress(100);
       done(null, data);
@@ -22,7 +21,6 @@ class ReactionWorker {
   async removeReactionFromDB(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { data } = job;
-      // add method to send data to database
       await reactionService.removeReactionDataFromDB(data);
       job.progress(100);
       done(null, data);

@@ -27,7 +27,7 @@ export class NotificationUtils {
       if (notificationData) {
         const index = findIndex(notifications, (notification) => notification._id === notificationId);
         notificationData.read = true;
-        notifications.splice(index, 1, notificationData); // replace object at index with notificationData
+        notifications.splice(index, 1, notificationData);
         if (type === 'notificationPage') {
           setNotifications(notifications);
         } else {

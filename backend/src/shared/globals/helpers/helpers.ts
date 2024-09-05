@@ -1,5 +1,4 @@
 export class Helpers {
-  // for using static methods of a class there is no need to instantiate the class with new keyword
   static firstLetterUppercase(str: string): string {
     const valueString = str.toLowerCase();
     return valueString
@@ -46,6 +45,6 @@ export class Helpers {
   }
 
   static escapeRegex(text: string): string {
-    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'); // regex to remove some unwanted characters, helps to search users in mongodb
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'); 
   }
 }

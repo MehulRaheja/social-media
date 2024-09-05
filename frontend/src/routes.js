@@ -37,7 +37,6 @@ export const AppRouter = () => {
     },
     {
       path: '/app/social',
-      // ProtectRoute will protect child routes as well
       element: (
         <ProtectedRoute>
           <Social />
@@ -47,7 +46,6 @@ export const AppRouter = () => {
         {
           path: 'streams',
           element: (
-            // till the component is not rendered.
             <Suspense fallback={<StreamsSkeleton />}>
               <Streams />
             </Suspense>

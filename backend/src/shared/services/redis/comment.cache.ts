@@ -19,7 +19,7 @@ export class CommentCache extends BaseCache {
         await this.client.connect();
       }
       await this.client.LPUSH(`comments:${postId}`, value);
-      const commentsCount: string[] = await this.client.HMGET(`posts:${postId}`, 'commentsCount'); // HMGET is used to get a sigle field value from posts collection/table
+      const commentsCount: string[] = await this.client.HMGET(`posts:${postId}`, 'commentsCount');
       let count: number = Helpers.parseJson(commentsCount[0]) as number;
       count++;
       await this.client.HSET(`posts:${postId}`, 'commentsCount', `${count}`);
@@ -34,7 +34,7 @@ export class CommentCache extends BaseCache {
       if(!this.client.isOpen){
         await this.client.connect();
       }
-      const reply: string[] = await this.client.LRANGE(`comments:${postId}`, 0, -1); // -1 is used to get all the comments from index 0
+      const reply: string[] = await this.client.LRANGE(`comments:${postId}`, 0, -1);
       const list: ICommentDocument[] = [];
       for(const item of reply) {
         list.push(Helpers.parseJson(item));
@@ -51,7 +51,7 @@ export class CommentCache extends BaseCache {
       if(!this.client.isOpen){
         await this.client.connect();
       }
-      const commentsCount: number = await this.client.LLEN(`comments:${postId}`); // gives count of comments/items in a particular key
+      const commentsCount: number = await this.client.LLEN(`comments:${postId}`);
       const comments: string[] = await this.client.LRANGE(`comments:${postId}`, 0, -1);
       const list: string[] = [];
       for(const item of comments){

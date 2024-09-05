@@ -20,7 +20,6 @@ const AuthTabs = () => {
     if (keepLoggedIn) navigate('/app/social/streams');
   }, [keepLoggedIn, navigate]);
 
-  // inline styles have properties in camel case
   return (
     <>
       {keepLoggedIn ? (

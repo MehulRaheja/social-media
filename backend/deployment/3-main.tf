@@ -1,15 +1,13 @@
-# here we will specified our backend and some local variables to use
 
 terraform {
   backend "s3" {
     bucket  = "socialiser-terraform-state"
-    key     = "develop/socialiser.tfstate" # in the s3 bucket it will go inside develop directory and create socialiser.tfstate file
-    region  = "ap-south-1"                 # variable does not work here
-    encrypt = true                         # encryption of the s3 state is enabled
+    key     = "develop/socialiser.tfstate"
+    region  = "ap-south-1"
+    encrypt = true
   }
 }
 
-# if we don't define a workspace, terraform will take a default workspace
 locals {
   prefix = "${var.prefix}-${terraform.workspace}"
 

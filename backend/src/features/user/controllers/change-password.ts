@@ -13,7 +13,6 @@ import { resetPasswordTemplate } from '@service/emails/templates/reset-password/
 import { emailQueue } from '@service/queues/email.queue';
 
 export class Update {
-  // need to update password on in the db because cache doesn't have this field
   @joiValidation(changePasswordSchema)
   public async password(req: Request, res: Response): Promise<void> {
     const { currentPassword, newPassword, confirmPassword } = req.body;
@@ -28,7 +27,6 @@ export class Update {
     const hashedPassword: string = await existingUser.hashPassword(newPassword);
     userService.updatePassword(`${req.currentUser!.username}`, hashedPassword);
 
-    // send email to user about password change
     const templateParams: IResetPasswordParams = {
       username: existingUser.username!,
       email: existingUser.email!,

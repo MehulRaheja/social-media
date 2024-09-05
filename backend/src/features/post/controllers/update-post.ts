@@ -34,13 +34,11 @@ export class Update {
     const postUpdated: IPostDocument = await postCache.updatePostInCache(postId, updatedPost);
     socketIOPostObject.emit('update post', postUpdated, 'posts');
     postQueue.addPostJob('updatePostInDB', { key: postId, value: updatedPost });
-    // Update.prototype.updatePostWithImage(req); // this can be used instead of above code
     res.status(HTTP_STATUS.OK).json({ message: 'Post updated successfully' });
   }
 
   @joiValidation(postWithImageSchema)
   public async postWithImage(req: Request, res: Response): Promise<void> {
-    // there are 2 cases here: update post data not image and update post with image
     const { imgId, imgVersion } = req.body;
     if (imgId && imgVersion) {
       Update.prototype.updatePost(req);
@@ -55,7 +53,6 @@ export class Update {
 
   @joiValidation(postWithVideoSchema)
   public async postWithVideo(req: Request, res: Response): Promise<void> {
-    // there are 2 cases here: update post data not image and update post with image
     const { videoId, videoVersion } = req.body;
     if (videoId && videoVersion) {
       Update.prototype.updatePost(req);
@@ -115,7 +112,6 @@ export class Update {
     socketIOPostObject.emit('update post', postUpdated, 'posts');
     postQueue.addPostJob('updatePostInDB', { key: postId, value: updatedPost });
     if (image) {
-      // call image queue to add image to mongodb database
       imageQueue.addImageJob('addImageToDB', {
         key: `${req.currentUser!.userId}`,
         imgId: result.public_id,

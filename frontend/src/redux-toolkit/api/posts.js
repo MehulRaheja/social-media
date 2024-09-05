@@ -2,7 +2,6 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { postService } from '@services/api/post/post.service';
 import { Utils } from '@services/utils/utils.service';
 
-// only to get first set of posts
 const getPosts = createAsyncThunk('post/getPosts', async (name, { dispatch }) => {
   try {
     const response = await postService.getAllPosts(1);

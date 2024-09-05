@@ -31,7 +31,7 @@ const notificationsSlice = createSlice({
       list = cloneDeep(list);
       list.unshift(toastItem);
       list = [...uniqBy(list, 'description')];
-      return list; // our state is an array, returning list will automatically set in the state
+      return list;
     },
     clearNotification: () => {
       list = [];

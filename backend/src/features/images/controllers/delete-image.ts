@@ -13,7 +13,6 @@ export class Delete {
   public async image(req: Request, res: Response): Promise<void> {
     const { imageId } = req.params;
     socketIOImageObject.emit('delete image', imageId);
-    // call image queue to remove image to mongodb database
     imageQueue.addImageJob('removeImageFromDB', {
       imageId
     });
@@ -34,7 +33,6 @@ export class Delete {
       ''
     ) as Promise<IUserDocument>;
     await Promise.all([bgImageId, bgImageVersion]) as [IUserDocument, IUserDocument];
-    // call image queue to add image to mongodb database
     imageQueue.addImageJob('removeImageFromDB', {
       imageId: image?._id
     });

@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { FaTrash } from 'react-icons/fa';
 import '@components/gallery-image/GalleryImage.scss';
 
-// figure tag is used to display image
 const GalleryImage = ({ post, showCaption, showDelete, imgSrc, onClick, onRemoveImage }) => {
   return (
     <>

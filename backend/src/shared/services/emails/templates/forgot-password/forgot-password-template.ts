@@ -3,7 +3,6 @@ import ejs from 'ejs';
 
 class ForgotPasswordTemplate {
   public passwordResetTemplate(username: string, resetLink: string): string {
-    // this will return ejs template file filled dynamic variables' values
     return ejs.render(fs.readFileSync(__dirname + '/forgot-password-template.ejs', 'utf8'), {
       username,
       resetLink,

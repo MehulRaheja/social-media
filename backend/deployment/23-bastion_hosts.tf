@@ -1,4 +1,3 @@
-# bastion will not be launched by using the autoscaling group, so we have created a different file for it
 resource "aws_instance" "bastion_host" {
   ami                         = data.aws_ami.ec2_ami.id
   instance_type               = var.bastion_host_type

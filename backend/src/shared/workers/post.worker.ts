@@ -9,7 +9,6 @@ class PostWorker {
   async savePostToDB(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { key, value } = job.data;
-      // add method to send data ot database
       await postService.addPostToDB(key, value);
       job.progress(100);
       done(null, job.data);
@@ -22,7 +21,6 @@ class PostWorker {
   async deletePostFromDB(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { keyOne, keyTwo } = job.data;
-      // add method to send data to database
       await postService.deletePost(keyOne, keyTwo);
       job.progress(100);
       done(null, job.data);
@@ -35,7 +33,6 @@ class PostWorker {
   async updatePostInDB(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { key, value } = job.data;
-      // add method to send data to database
       await postService.editPost(key, value);
       job.progress(100);
       done(null, job.data);

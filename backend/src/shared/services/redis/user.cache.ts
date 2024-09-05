@@ -82,7 +82,7 @@ export class UserCache extends BaseCache {
         await this.client.connect();
       }
 
-      const response: IUserDocument = (await this.client.HGETALL(`users:${userId}`)) as unknown as IUserDocument; // we can't directly cast it into IUserDocument so need to make the result unkown first
+      const response: IUserDocument = (await this.client.HGETALL(`users:${userId}`)) as unknown as IUserDocument;
       response.createdAt = new Date(Helpers.parseJson(`${response.createdAt}`));
       response.postsCount = Helpers.parseJson(`${response.postsCount}`);
       response.blocked = Helpers.parseJson(`${response.blocked}`);
@@ -106,7 +106,7 @@ export class UserCache extends BaseCache {
     }
   }
 
-  public async getUsersFromCache(start: number, end: number, excludedUserKey: string): Promise<IUserDocument[]> { // excludedUserKey will remove logged in user from the list
+  public async getUsersFromCache(start: number, end: number, excludedUserKey: string): Promise<IUserDocument[]> {
     try {
       if (!this.client.isOpen) {
         await this.client.connect();
@@ -146,13 +146,13 @@ export class UserCache extends BaseCache {
     }
   }
 
-  public async getRandomUsersFromCache(userId: string, excludedUsername: string): Promise<IUserDocument[]> { // excludedUsername will remove logged in user from the list
+  public async getRandomUsersFromCache(userId: string, excludedUsername: string): Promise<IUserDocument[]> {
     try {
       if (!this.client.isOpen) {
         await this.client.connect();
       }
       const replies: IUserDocument[] = [];
-      const followers: string[] = await this.client.LRANGE(`following:${userId}`, 0, -1); // replaced follower with following (bug)
+      const followers: string[] = await this.client.LRANGE(`following:${userId}`, 0, -1);
       const users: string[] = await this.client.ZRANGE('user', 0, -1);
       const randomUsers: string[] = Helpers.shuffle(users).slice(0, 10);
       for(const key of randomUsers) {
@@ -215,4 +215,3 @@ export class UserCache extends BaseCache {
     }
   }
 }
-// by using ZADD we can get all the user properties from redis at the same time. by default redis give one property at a time from hset

@@ -14,7 +14,6 @@ export class Add {
   public async comment(req: Request, res: Response): Promise<void> {
     const { userTo, postId, profilePicture, comment } = req.body;
 
-    // we need to create comment object id because we will first add it to the cache
     const commentObjectId: ObjectId = new ObjectId();
     const commentData: ICommentDocument = {
       _id: commentObjectId,

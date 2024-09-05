@@ -1,9 +1,7 @@
 # EditorConfig is awesome: https://EditorConfig.org
 
-# top-most EditorConfig file
 root = true
 
-# this setting will be applied to every file type
 [*]
 charset = utf-8
 indent_style = space

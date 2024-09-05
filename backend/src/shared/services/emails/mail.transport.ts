@@ -44,7 +44,6 @@ class MailTransport {
     };
 
     try {
-      // send mail with defined transport object
       await transporter.sendMail(mailOptions);
       log.info('Development email sent successfully');
     } catch (error) {
@@ -62,7 +61,6 @@ class MailTransport {
     };
 
     try {
-      // send mail with defined transport object
       await sendGridMail.send(mailOptions);
       log.info('Production email sent successfully');
     } catch (error) {

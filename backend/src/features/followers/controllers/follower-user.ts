@@ -15,12 +15,10 @@ const userCache: UserCache = new UserCache();
 export class Add {
   public async follower(req: Request, res: Response): Promise<void>{
     const { followerId } = req.params;
-    // update count in cache
-    const followersCount: Promise<void> = followerCache.updateFollowersCountInCache(`${followerId}`, 'followersCount', 1); // update followers count
-    const followeeCount: Promise<void> = followerCache.updateFollowersCountInCache(`${req.currentUser!.userId}`, 'followingCount', 1); // update following count
+    const followersCount: Promise<void> = followerCache.updateFollowersCountInCache(`${followerId}`, 'followersCount', 1);
+    const followeeCount: Promise<void> = followerCache.updateFollowersCountInCache(`${req.currentUser!.userId}`, 'followingCount', 1);
     await Promise.all([followeeCount, followersCount]);
 
-    // get user data from cache
     const cachedFollower: Promise<IUserDocument> = userCache.getUserFromCache(followerId) as Promise<IUserDocument>;
     const cachedFollowee: Promise<IUserDocument> = userCache.getUserFromCache(`${req.currentUser!.userId}`) as Promise<IUserDocument>;
     const response: [IUserDocument, IUserDocument] = await Promise.all([cachedFollower, cachedFollowee]);
@@ -33,7 +31,6 @@ export class Add {
     const addFolloweeToCache: Promise<void> = followerCache.saveFollowerToCache(`followers:${followerId}`, `${req.currentUser!.userId}`);
     await Promise.all([addFollowerToCache, addFolloweeToCache]);
 
-    // send data to queue
     followerQueue.addFollowerJob('addFollowerToDB', {
       keyOne: `${req.currentUser!.userId}`,
       keyTwo: `${followerId}`,

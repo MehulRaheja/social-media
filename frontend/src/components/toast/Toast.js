@@ -17,7 +17,7 @@ const Toast = (props) => {
     listData.current.splice(0, 1);
     setList([...listData.current]);
     if (!listData.current.length) {
-      list.length = 0; // if there is no data in listData then we will directly empty the list
+      list.length = 0;
       Utils.dispatchClearNotification(dispatch);
     }
   }, [list, dispatch]);

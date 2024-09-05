@@ -12,7 +12,6 @@ export class CurrentUser {
     let token = null;
     let user = null;
 
-    // reason we use ! instead of ? because currentUser is already an optional object in req and ! silence the copiler warning and ? make it as an optional
     const cachedUser: IUserDocument = (await userCache.getUserFromCache(`${req.currentUser!.userId}`)) as IUserDocument;
     const existingUser: IUserDocument = cachedUser
       ? cachedUser

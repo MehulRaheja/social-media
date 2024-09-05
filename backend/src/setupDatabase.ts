@@ -3,7 +3,7 @@ import Logger from 'bunyan';
 import { config } from '@root/config';
 import { redisConnetion } from '@service/redis/redis.connection';
 
-const log: Logger = config.createLogger('setupDatabase'); // whenever we see log/error with the name setupDatabase, means it is coming from server file.
+const log: Logger = config.createLogger('setupDatabase');
 
 export default () => {
   const connect = () => {
@@ -15,10 +15,10 @@ export default () => {
       })
       .catch((error) => {
         log.error('Error connecting to database', error);
-        return process.exit(1); // to exit the current process, if connecting to db fails
+        return process.exit(1);
       });
   };
   connect();
 
-  mongoose.connection.on('disconnected', connect); // If mongoose gets disconnected then it will try to connect again
+  mongoose.connection.on('disconnected', connect);
 };

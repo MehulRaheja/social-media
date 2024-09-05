@@ -42,15 +42,11 @@ class Config {
     this.EC2_URL = process.env.EC2_URL || '';
   }
 
-  // in console name will be used as an identifier
-  // | ./node_modules/.bin/bunyan (for mac)  is added to dev script in package.json to use this library for logging purposes
-  // | .\\node_modules\\.bin\\bunyan (for windows)
   public createLogger(name: string): bunyan {
     return bunyan.createLogger({ name, level: 'debug' });
   }
 
   public validateConfig(): void {
-    // this keyword refers to an object, it contains all the above properties as key-value pairs
     for (const [key, value] of Object.entries(this)) {
       if (value === undefined) {
         throw new Error(`Configuration ${key} is undefined.`);
@@ -58,7 +54,6 @@ class Config {
     }
   }
 
-  // to allow our application to access cloudinary we create a public method
   public cloudinaryConfig(): void {
     cloudinary.v2.config({
       cloud_name: this.CLOUD_NAME,

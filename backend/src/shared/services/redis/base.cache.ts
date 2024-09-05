@@ -2,7 +2,6 @@ import { config } from '@root/config';
 import Logger from 'bunyan';
 import { createClient } from 'redis';
 
-// whatever is the type of createClient we are defining it as a type
 export type RedisClient = ReturnType<typeof createClient>;
 
 export abstract class BaseCache {

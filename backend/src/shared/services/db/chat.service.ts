@@ -7,7 +7,7 @@ import { ObjectId } from 'mongodb';
 class ChatService {
   public async addMessageToDB(data: IMessageData): Promise<void> {
     const conversation: IConversationDocument[] = await ConversationModel.find({ _id: data?.conversationId }).exec();
-    if(conversation.length === 0) { // if conversation id doesn't exist then we'll create a new one
+    if(conversation.length === 0) {
       await ConversationModel.create({
         _id: data?.conversationId,
         senderId: data.senderId,

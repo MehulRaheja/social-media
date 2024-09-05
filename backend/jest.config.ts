@@ -2,10 +2,9 @@ import type { Config } from '@jest/types';
 
 // Sync object
 const config: Config.InitialOptions = {
-  // check official documentation for below configuration details
   preset: 'ts-jest',
   testEnvironment: 'node',
-  verbose: true, //if it is false then it will only print when the test is completed
+  verbose: true,
   coverageDirectory: 'coverage',
   collectCoverage: true,
   testPathIgnorePatterns: ['/node_modules/'],
@@ -23,7 +22,6 @@ const config: Config.InitialOptions = {
     }
   },
   coverageReporters: ['text-summary', 'lcov'],
-  // we are using custom paths in the project to run and we need to define here as well so that tests can also use those paths
   moduleNameMapper: {
     '@auth/(.*)': ['<rootDir>/src/features/auth/$1'],
     '@user/(.*)': ['<rootDir>/src/features/user/$1'],

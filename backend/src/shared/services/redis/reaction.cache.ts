@@ -13,7 +13,6 @@ export class ReactionCache extends BaseCache {
     super('reactionsCache');
   }
 
-  // we will push reactions into a list of reactions of a post, LPUSH is used to push in the beginning and RPUSH is used to push in the end of the list
   public async savePostReactionToCache(
     key: string,
     reaction: IReactionDocument,
@@ -26,13 +25,13 @@ export class ReactionCache extends BaseCache {
         await this.client.connect();
       }
 
-      if(previousReaction){ // if there is previous reaction then we will remove it first
+      if(previousReaction){
         this.removePostReactionFromCache(key, reaction.username, postReactions);
       }
 
-      if (type) { // if there is type then we will add the reaction
-        await this.client.LPUSH(`reactions:${key}`, JSON.stringify(reaction)); // list in redis accepts data in string so we have to stringify it first
-        await this.client.HSET(`posts:${key}`, 'reactions', JSON.stringify(postReactions)); // update the post's reactions field after adding reaction
+      if (type) {
+        await this.client.LPUSH(`reactions:${key}`, JSON.stringify(reaction));
+        await this.client.HSET(`posts:${key}`, 'reactions', JSON.stringify(postReactions));
       }
 
     } catch (error) {
@@ -46,12 +45,10 @@ export class ReactionCache extends BaseCache {
       if(!this.client.isOpen) {
         await this.client.connect();
       }
-      // LRANGE: to get data from the redis list
-      // ZRANGE: to get data from the redis hashmap
-      const resposnse: string[] = await this.client.LRANGE(`reactions:${key}`, 0, -1); // to get all the data from the list
+      const resposnse: string[] = await this.client.LRANGE(`reactions:${key}`, 0, -1);
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       const userPreviousReaction: IReactionDocument = this.getPreviousReaction(resposnse, username) as IReactionDocument;
-      multi.LREM(`reactions:${key}`, 1, JSON.stringify(userPreviousReaction)); // LREM is used to remove an string from a redis list
+      multi.LREM(`reactions:${key}`, 1, JSON.stringify(userPreviousReaction));
       await multi.exec();
 
       await this.client.HSET(`posts:${key}`, 'reactions', JSON.stringify(postReactions));
@@ -66,12 +63,9 @@ export class ReactionCache extends BaseCache {
       if(!this.client.isOpen) {
         await this.client.connect();
       }
-      // LLEN is used to get length of the list in redis
       const reactionsCount: number = await this.client.LLEN(`reactions:${postId}`);
 
-      // LRANGE: to get data from the redis list
-      // ZRANGE: to get data from the redis hashmap
-      const resposnse: string[] = await this.client.LRANGE(`reactions:${postId}`, 0, -1); // to get all the data from the list
+      const resposnse: string[] = await this.client.LRANGE(`reactions:${postId}`, 0, -1);
       const list: IReactionDocument[] = [];
       for(const item of resposnse){
         list.push(Helpers.parseJson(item));
@@ -88,9 +82,7 @@ export class ReactionCache extends BaseCache {
       if(!this.client.isOpen) {
         await this.client.connect();
       }
-      // LRANGE: to get data from the redis list
-      // ZRANGE: to get data from the redis hashmap
-      const resposnse: string[] = await this.client.LRANGE(`reactions:${postId}`, 0, -1); // to get all the data from the list
+      const resposnse: string[] = await this.client.LRANGE(`reactions:${postId}`, 0, -1);
       const list: IReactionDocument[] = [];
       for(const item of resposnse){
         list.push(Helpers.parseJson(item));
